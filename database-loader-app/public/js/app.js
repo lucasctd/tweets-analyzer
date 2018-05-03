@@ -13892,29 +13892,42 @@ window.Vue = __webpack_require__(38);
  */
 
 //Vue.component('example-component', require('./components/ExampleComponent.vue'));
-
-var app = new Vue({
-    el: '#app',
-    data: {
-        status: 'Processando requisição.'
+var tweetsLoaderChannel = Echo.channel('tweets-loader');
+Vue.component('load-database', {
+    data: function data() {
+        return {
+            hashtag: '',
+            status: '',
+            amount: null
+        };
     },
-    created: function created() {
-        this.loadData();
-    },
-
     methods: {
-        loadData: function loadData() {
-            axios.post('http://tweets-loader.wazzu/load-data?hashtag=bolsonaro&amount=1000').then(function (response) {
-                this.status = response.data.message;
+        load: function load() {
+            var that = this;
+            axios.post('http://tweets-analyzer.wazzu//load-data?hashtag=' + this.hashtag + '&amount=' + this.amount).then(function (response) {
+                that.status = response.data.message;
+                var event = '.load-data-status-' + response.data.eventId;
+                tweetsLoaderChannel.listen(event, function (e) {
+                    that.status = e.status;
+                });
             }).catch(function (response) {
                 this.status = response.data.error;
             });
         }
-    }
+    },
+    template: '<div>\n                    <label>Hashtag:</label><input style="margin: 10px" v-model="hashtag" type="text"/>\n                    <label>Amount:</label> <input style="margin: 10px" v-model="amount" type="number"/>\n                    <button style="margin: 10px" @click="load()">Load on Database</button> Status: {{status}} \n               </div>'
 });
 
-Echo.channel('tweets-loader').listen('.load-data-status', function (e) {
-    app.status = e.status;
+var app = new Vue({
+    el: '#app',
+    data: {
+        numberComponents: 1
+    },
+    methods: {
+        addMore: function addMore() {
+            this.numberComponents++;
+        }
+    }
 });
 
 /***/ }),
@@ -13957,13 +13970,13 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
  * a simple convenience so we don't have to attach every token manually.
  */
 
-var token = document.head.querySelector('meta[name="csrf-token"]');
+/*let token = document.head.querySelector('meta[name="csrf-token"]');
 
 if (token) {
-  window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
 } else {
-  console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
-}
+    console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
+}*/
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening

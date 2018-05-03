@@ -11,12 +11,11 @@
         <div class="flex-center position-ref full-height">
             <div id="app" class="content">
 
-                <div class="title m-b-md">
+                <h2>
                     Tweets Loader
-                </div>
-                <p>
-                   Status: @{{ status }}
-                </p>
+                </h2>
+                <button @click="addMore">Add More Data</button>
+                <load-database v-for="n in numberComponents"></load-database>
             </div>
         </div>
     </body>

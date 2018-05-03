@@ -18,6 +18,7 @@ class Tweet extends Model
 	public static function make(object $data, ?int $placeId) : Tweet
     {
         $text = self::getValue('text', $data);
+        Log::info($data);
         $tweet = new Tweet(
             [
                 'tweet_id' => $data->id,

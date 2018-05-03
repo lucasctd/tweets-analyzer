@@ -16,29 +16,46 @@ window.Vue = require('vue');
  */
 
 //Vue.component('example-component', require('./components/ExampleComponent.vue'));
-
-const app = new Vue({
-    el: '#app',
-    data: {
-        status: 'Processando requisição.'
+const tweetsLoaderChannel = Echo.channel('tweets-loader');
+Vue.component('load-database', {
+    data: function () {
+        return {
+            hashtag: '',
+            status: '',
+            amount: null
+        }
     },
-    created(){
-      this.loadData();
-    },
-    methods:{
-        loadData(){
-            axios.post('http://tweets-loader.wazzu/load-data?hashtag=bolsonaro&amount=1000')
+    methods: {
+        load(){
+            let that = this;
+            axios.post('http://tweets-analyzer.wazzu//load-data?hashtag='+this.hashtag+'&amount='+ this.amount)
                 .then(function (response) {
-                    this.status = response.data.message;
+                    that.status = response.data.message;
+                    let event = '.load-data-status-' + response.data.eventId;
+                    tweetsLoaderChannel.listen(event, (e) => {
+                        that.status = e.status;
+                    });
                 })
                 .catch(function (response) {
                     this.status = response.data.error;
                 });
         }
-    }
+    },
+    template: `<div>
+                    <label>Hashtag:</label><input style="margin: 10px" v-model="hashtag" type="text"/>
+                    <label>Amount:</label> <input style="margin: 10px" v-model="amount" type="number"/>
+                    <button style="margin: 10px" @click="load()">Load on Database</button> Status: {{status}} 
+               </div>`
 });
 
-Echo.channel('tweets-loader')
-    .listen('.load-data-status', (e) => {
-        app.status = e.status;
-    });
+const app = new Vue({
+    el: '#app',
+    data:{
+        numberComponents: 1
+    },
+    methods:{
+        addMore(){
+            this.numberComponents++;
+        }
+    }
+});

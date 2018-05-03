@@ -25,9 +25,10 @@ class AppController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function loadData(Request $request){
+        $requestId = hexdec(uniqid());
         if($request->has('hashtag') && $request->has('amount')){
-            LoadDataJob::dispatch($request->hashtag, $request->amount);
-            return response()->json(['message' => 'Your request is being processed.'], 200);
+            LoadDataJob::dispatch($request->hashtag, $request->amount, $requestId);
+            return response()->json(['message' => 'Your request is being processed.', 'eventId' => $requestId], 200);
         }else{
             return response()->json(['error' => 'At least one parameter is missing, please, provide both of them (hashtag and amount'], 401);
         }

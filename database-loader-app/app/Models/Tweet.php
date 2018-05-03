@@ -17,8 +17,8 @@ class Tweet extends Model
 	
 	public static function make(object $data, ?int $placeId) : Tweet
     {
-        Log::info('tweet owner '. $data->user['screen_name']);
         $text = self::getValue('text', $data);
+        Log::info($data);
         $tweet = new Tweet(
             [
                 'tweet_id' => $data->id,
@@ -54,7 +54,7 @@ class Tweet extends Model
      */
     private static function getValue(string $property, $data)
     {
-        return property_exists($data, $property) ? $data["$property"] : null;
+        return property_exists($data, $property) ? (is_object($data) ? $data->$property : $data[$property]) : null;
     }
 
 }

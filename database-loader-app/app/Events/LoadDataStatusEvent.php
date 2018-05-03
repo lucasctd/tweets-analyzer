@@ -16,15 +16,18 @@ class LoadDataStatusEvent implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $status;
+    public $id;
 
     /**
      * Create a new event instance.
      *
      * @param $status
+     * @param $id
      */
-    public function __construct($status)
+    public function __construct($status, $id)
     {
         $this->status = $status;
+        $this->id = $id;
     }
 
     /**
@@ -44,6 +47,6 @@ class LoadDataStatusEvent implements ShouldBroadcast
      */
     public function broadcastAs()
     {
-        return 'load-data-status';
+        return 'load-data-status-'.$this->id;
     }
 }

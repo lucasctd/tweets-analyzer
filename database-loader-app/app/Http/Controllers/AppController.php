@@ -26,11 +26,11 @@ class AppController extends Controller
      */
     public function loadData(Request $request){
         $requestId = hexdec(uniqid());
-        if($request->has('hashtag') && $request->has('amount')){
-            LoadDataJob::dispatch($request->hashtag, $request->amount, $requestId);
+        if($request->has('query') && $request->has('count')){
+            LoadDataJob::dispatch($request->get('query'), $request->get('count'), $requestId);
             return response()->json(['message' => 'Your request is being processed.', 'eventId' => $requestId], 200);
         }else{
-            return response()->json(['error' => 'At least one parameter is missing, please, provide both of them (hashtag and amount'], 401);
+            return response()->json(['error' => 'At least one parameter is missing, please, provide both of them (query and count'], 401);
         }
 	}
 }

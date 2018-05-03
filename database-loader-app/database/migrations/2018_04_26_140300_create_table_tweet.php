@@ -17,12 +17,13 @@ class CreateTableTweet extends Migration
             $table->increments('id');
             $table->bigInteger('tweet_id');
             $table->string('id_str', 20);
-            $table->string('text', 280);
+            $table->string('text', 500);
             $table->string('tweet_owner', 100);
             $table->integer('favorite_count')->nullable();
             $table->integer('retweet_count');
             $table->integer('reply_count')->nullable();
             $table->integer('quote_count')->nullable();
+			$table->string('followers_count')->nullable();
             $table->string('url', 150);
 			$table->timestamp('tweet_created_at');
 			$table->timestamp('created_at')->useCurrent();
@@ -30,6 +31,8 @@ class CreateTableTweet extends Migration
 			$table->integer('pla_id')->unsigned()->nullable();
 			$table->foreign('pla_id')->references('id')->on('place');
         });
+		
+		DB::statement('ALTER TABLE tweet ADD CONSTRAINT UC_TEXT_OWNER UNIQUE (text,tweet_owner);');
     }
 
     /**

@@ -4,25 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class HashTag extends Model
+class HashTagUserName extends Model
 {
-    public $table = 'hashtag';
+    public $table = 'hashtag_username';
     public $timestamps = false;
 
     protected $fillable = [
-        'name', 'primary', 'tweet_id'
+        'name', 'primary', 'tweet_id', 'username'
     ];
 
-    public static function make(string $name, bool $primary, int $tweetId) : HashTag
+    public static function make(string $name, bool $primary, bool $username, int $tweetId) : HashTag
     {
-        $hashtag = new HashTag(
+        $hashTagUserName = new HashTag(
             [
                 'name' => $name,
                 'primary' => $primary,
+				'username' => $username,
                 'tweet_id' => $tweetId,
             ]
         );
-        return $hashtag;
+        return $hashTagUserName;
     }
 
     /**

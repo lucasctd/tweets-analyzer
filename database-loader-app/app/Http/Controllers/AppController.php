@@ -2,12 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Place;
-use Illuminate\Http\Request;
 use App\Jobs\LoadDataJob;
-use App\Events\LoadDataStatusEvent;
-use Illuminate\Support\Facades\Log;
-use GuzzleHttp\Client;
+use Illuminate\Http\Request;
 
 class AppController extends Controller
 {

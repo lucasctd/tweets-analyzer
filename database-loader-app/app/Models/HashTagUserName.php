@@ -13,9 +13,9 @@ class HashTagUserName extends Model
         'name', 'primary', 'tweet_id', 'username'
     ];
 
-    public static function make(string $name, bool $primary, bool $username, int $tweetId) : HashTag
+    public static function make(string $name, bool $primary, bool $username, int $tweetId) : HashTagUserName
     {
-        $hashTagUserName = new HashTag(
+        $hashTagUserName = new HashTagUserName(
             [
                 'name' => $name,
                 'primary' => $primary,

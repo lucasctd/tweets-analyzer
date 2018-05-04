@@ -43,14 +43,14 @@ class LoadDataJob implements ShouldQueue
      */
     public function handle(Client $client)
     {
-        $url = 'http://api.programmer.com.br.wazzu/Twitter?query=' . $this->encodeUrl($this->query) . '&count=' . $this->count;
+        $url = 'https://api.programmer.com.br/Twitter?query=' . $this->encodeUrl($this->query) . '&count=' . $this->count;
         try{
             event(new LoadDataStatusEvent('Carregando Dados...', $this->id));
             $response = $client->request('GET', $url,
                 [
                     'headers' => [
                         'Accept' => 'application/json',
-                        'Authorization' => 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjY4ZjMyNTcxN2FkNmY1ZTI3ZDhiODkzYTA1N2RjYjE0OGZlMGJmNTJiNWU2ZDRjYWI2OGI1OWY4ZDE3MmNmZDQzNzAwYzM5ZTYwYTdkY2Q4In0.eyJhdWQiOiIxIiwianRpIjoiNjhmMzI1NzE3YWQ2ZjVlMjdkOGI4OTNhMDU3ZGNiMTQ4ZmUwYmY1MmI1ZTZkNGNhYjY4YjU5ZjhkMTcyY2ZkNDM3MDBjMzllNjBhN2RjZDgiLCJpYXQiOjE1MjUzNDg4NTEsIm5iZiI6MTUyNTM0ODg1MSwiZXhwIjoxNTU2ODg0ODUxLCJzdWIiOiIxIiwic2NvcGVzIjpbXX0.cqeWjVyCxPeklfbw4iVvNkVZY065t4MPelJxCwhDfPBBpyn_J86tYvJIumqzO9O-iNER20vf6gRdfJQ7E8J8UfYBy8M7AjbBsbxv_JYcMr6p4soqfSZfdTUWAPOo8ZT0Dz1zhuouuCKNi8Idd_Ryx2uYym4G7Eya6IAHzfqlM7GcSqe_g59jhC3xshgXgIPLug8RbCfi4g-2Ei_YJl4IqhBHI5M84PzyaPmOuVRVliTo9P5eGtyFms8RXCHMeA_KTzguFLfP32lfIKWaWo8sKlgAs8Wtw-BX9otF-43T9wap7ELCvtMrgdOqq_DQsgqpUYIjRkh2fol0dsd7RCpKEHJKkl0sgkAoMCLo8zNwCp-BNccWFz_MwyO0_mtHVurkjFGknazn7aYA5qwJAKZ3h-zkwpoXB-uK-CeGOfjqpNcNaUdots4xOTe4SR5QsXLnoV8Z6DrG_NxT9aFTaTW3gFaMqzch7cXYUNZjrNSQYtuLa8qnfQUZsPhEgv1WRijUi2YFAIrN_pn2u8LHJVxUeCrIylf5FjmIuiVUL_xf9VHmmzIJBrtZzmdKNXogngW66cOMy5zZYfAPdeRnsqRCuQ5DYcrVYscOntlysQV944ySE6a2faU1lobidIy5HVcEZUX42qXw4lnkU0fBwbQY15ZxXKQ612pzoq-VNeOmLX8',
+                        'Authorization' => 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjZlNDY0YzczM2E3MDVmNTk3ZWY4NzJmYWI0NDFiMTE5Y2M0NzVlMjQ0NTAwNDhhOWQ4NzE5NmNkZGFjNjI0OTM4YmNlZWJkOTkzYTUxNDRiIn0.eyJhdWQiOiIxNyIsImp0aSI6IjZlNDY0YzczM2E3MDVmNTk3ZWY4NzJmYWI0NDFiMTE5Y2M0NzVlMjQ0NTAwNDhhOWQ4NzE5NmNkZGFjNjI0OTM4YmNlZWJkOTkzYTUxNDRiIiwiaWF0IjoxNTI1MzkzMjQ2LCJuYmYiOjE1MjUzOTMyNDYsImV4cCI6MTU1NjkyOTI0Niwic3ViIjoiMSIsInNjb3BlcyI6W119.HlssUad-gyTY5XnDKDJSlYCTuFEPA6tjKGUlvRIP2rC6-klfbSRCBPVEEr8pfQdQeI9RddVcQBe6CXvZLgC7BI9erDAMOpfFq_aofM7WQoYZxTHhIQy3_QdeRZT_RTepfgKOzJHtEETvoQdaVW1eDdAW8VPmAQLBJ2kwtEdHqsW1wG3Qohg44-JKm1lVUWmopG3-P6eVkmsvU3MFoZ7udihO4paQRFAiubxJ-ygz6cR3nozPDDhXMH-eL8X2_jiKXQm1jkOBnbcYNWW9JYiPEfH286LVeqhWdErk-toMJ05NH-sVlwE0MmcXpIRPTU1gbhIRuOPjdHWrhuTU3Qb4n-eiJcphAcEXxF6ILBBABf4UCXcOPZbny9QtTrpNN0PV1udFh0W4N6xyQ-54SM5EYxVQbRAZWqVfNr5h5BOF4t4MMp-jCRwl6vaE3fdAo_s1tWRKklMH6rcgqY4HKqbZV453J0U6me5QjQFAgcRXhkzipvlU_xriH7u4JSF9oqlRiIe0Xm0NAFxxIkl8nTKO5RcWW2wv5sM-ivFCB2IKRWy8iAPi2UAhwZezdhRBPMRa9HTzN7r1hWlIkGN9s48Hg7XmQSfXJfZm3_5ixAV-7tjGiBkKl-NVa0bOAWhLm_sHXnPIHs4O3C7NiiGUxMfRJ6Vx5qGPjdziXcJeu9ASU8Y',
                     ]
                 ]);
             event(new LoadDataStatusEvent('Dados Carregados!', $this->id));

@@ -52,7 +52,7 @@ class SaveDataJob implements ShouldQueue
             $tweetsSalvos = 0;
             foreach ($this->data->data as $tweet){
                 try{
-                    DB::beginTransaction();
+                    //DB::beginTransaction();
                     $tweetJson = (object) $tweet;
                     $placeId = $this->getPlace($tweetJson);
                     $tweet = Tweet::make($tweetJson, $placeId);
@@ -62,17 +62,18 @@ class SaveDataJob implements ShouldQueue
                         $this->saveSecundaryHashTags($tweet->id, $tweetJson->entities['hashtags']);
                     }
                     $tweetsSalvos++;
-                    DB::commit();
+                   // DB::commit();
                 }catch (Exception $e){
-                    DB::rollBack();
+                   // DB::rollBack();
                     $tweetText = Tweet::getValue('text', $tweetJson) != null ? Tweet::getValue('text', $tweetJson) : Tweet::getValue('full_text', $tweetJson);
                     if($e->getCode() == 23000){
                         //event(new LoadDataStatusEvent('Tweet de usuário '.$tweet->tweet_owner.' duplicado. Tweet ignorado!', $this->id));
                         Log::error($e->getMessage());
+                        Log::error($e->getTraceAsString());
 						Log::error('Tweet duplicado: ' . $tweetText);
                         $tweetsDuplicados++;
                     }else{
-						Log::error($e->getMessage());
+                        Log::error($e->getMessage());
                         Log::error($e->getTraceAsString());
                         Log::error('Erro ao salvar tweet: ' . $tweetText );
                         $tweetsComErro++;
@@ -108,7 +109,7 @@ class SaveDataJob implements ShouldQueue
 
     private function saveSecundaryHashTags(int $tweetId, array $hashTags){
         foreach ($hashTags as $hashTag){
-            $hashTag = HashTagUserName::make($hashTag['text'], false, $tweetId);
+            $hashTag = HashTagUserName::make($hashTag['text'], false, false, $tweetId);
             $hashTag->save();
         }
     }

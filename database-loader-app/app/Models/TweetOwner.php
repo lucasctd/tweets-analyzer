@@ -24,6 +24,7 @@ class TweetOwner extends Model
             [
                 'user_id' => $data->id,
                 'id_str' => $data->id_str,
+				'name' => $data->name,
                 'screen_name' => $data->screen_name,
                 'location' => $data->location,
                 'url' => $data->url,

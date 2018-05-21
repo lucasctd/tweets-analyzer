@@ -10,7 +10,9 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use App\Models\Place;
+use App\Models\City;
+use App\Models\State;
+use App\Models\TweetOwner;
 use App\Models\Tweet;
 use Illuminate\Support\Facades\Log;
 use Exception;
@@ -51,10 +53,17 @@ class SaveDataJob implements ShouldQueue
             $tweetsDuplicados = 0;
             $tweetsComErro = 0;
             $tweetsSalvos = 0;
+			$usuariosRepetidos = 0;
             foreach ($this->data->data as $tweet){
                 try{
                     DB::beginTransaction();
                     $tweetJson = (object) $tweet;
+					try{
+						TweetOwner::where('screen_name', $user->screen_name)->firstOrFail();
+						$usuariosRepetidos++;
+					}catch (ModelNotFoundException $e){
+						
+					}
                     $tweet = Tweet::make($tweetJson);
                     $tweet->save();
                     $this->saveHashTag($tweet->id);
@@ -95,6 +104,28 @@ class SaveDataJob implements ShouldQueue
             $hashTag = HashTagUserName::make($hashTag['text'], false, false, $tweetId);
             $hashTag->save();
         }
+    }
+	
+	private function saveOwner() : TweetOwner{
+		$cityId = null;
+		$stateId = null;
+		$location = explode(',', $user->location);
+		if(count($location) > 1){
+			$cityId = $this->getCity($location[0]);
+			$stateId = $this->getState($location[0]);
+		}
+		$towner = TweetOwner::make($user, $cityId, $stateId);
+		$towner->save();
+	}
+	
+	private function getCity($cityName) : int{
+        $city = City::where('nome', $cityName)->get();
+        return count($city) === 1 ? $city->first()->codigo : null;
+    }
+
+    private function getState($cityName) : int{
+        $state = State::where('nome', $cityName)->get();
+        return $state->isNotEmpty() ? $state->first()->codigo : null;
     }
 
     /**

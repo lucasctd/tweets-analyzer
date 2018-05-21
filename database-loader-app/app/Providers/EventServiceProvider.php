@@ -16,6 +16,9 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\LoadDataStatusEvent' => [
             'App\Listeners\LoadDataStatusListener',
         ],
+        'App\Events\LoadUserDataStatusEvent' => [
+            'App\Listeners\LoadUserDataStatusListener',
+        ]
     ];
 
     /**

@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use App\Events\LoadDataStatusEvent;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -39,7 +39,6 @@ class LoadDataJob implements ShouldQueue
      *
      * @param Client $client
      * @return void
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function handle(Client $client)
     {
@@ -50,13 +49,13 @@ class LoadDataJob implements ShouldQueue
                 [
                     'headers' => [
                         'Accept' => 'application/json',
-                        'Authorization' => 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjZlNDY0YzczM2E3MDVmNTk3ZWY4NzJmYWI0NDFiMTE5Y2M0NzVlMjQ0NTAwNDhhOWQ4NzE5NmNkZGFjNjI0OTM4YmNlZWJkOTkzYTUxNDRiIn0.eyJhdWQiOiIxNyIsImp0aSI6IjZlNDY0YzczM2E3MDVmNTk3ZWY4NzJmYWI0NDFiMTE5Y2M0NzVlMjQ0NTAwNDhhOWQ4NzE5NmNkZGFjNjI0OTM4YmNlZWJkOTkzYTUxNDRiIiwiaWF0IjoxNTI1MzkzMjQ2LCJuYmYiOjE1MjUzOTMyNDYsImV4cCI6MTU1NjkyOTI0Niwic3ViIjoiMSIsInNjb3BlcyI6W119.HlssUad-gyTY5XnDKDJSlYCTuFEPA6tjKGUlvRIP2rC6-klfbSRCBPVEEr8pfQdQeI9RddVcQBe6CXvZLgC7BI9erDAMOpfFq_aofM7WQoYZxTHhIQy3_QdeRZT_RTepfgKOzJHtEETvoQdaVW1eDdAW8VPmAQLBJ2kwtEdHqsW1wG3Qohg44-JKm1lVUWmopG3-P6eVkmsvU3MFoZ7udihO4paQRFAiubxJ-ygz6cR3nozPDDhXMH-eL8X2_jiKXQm1jkOBnbcYNWW9JYiPEfH286LVeqhWdErk-toMJ05NH-sVlwE0MmcXpIRPTU1gbhIRuOPjdHWrhuTU3Qb4n-eiJcphAcEXxF6ILBBABf4UCXcOPZbny9QtTrpNN0PV1udFh0W4N6xyQ-54SM5EYxVQbRAZWqVfNr5h5BOF4t4MMp-jCRwl6vaE3fdAo_s1tWRKklMH6rcgqY4HKqbZV453J0U6me5QjQFAgcRXhkzipvlU_xriH7u4JSF9oqlRiIe0Xm0NAFxxIkl8nTKO5RcWW2wv5sM-ivFCB2IKRWy8iAPi2UAhwZezdhRBPMRa9HTzN7r1hWlIkGN9s48Hg7XmQSfXJfZm3_5ixAV-7tjGiBkKl-NVa0bOAWhLm_sHXnPIHs4O3C7NiiGUxMfRJ6Vx5qGPjdziXcJeu9ASU8Y',
+                        'Authorization' => 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjgwYzc3YjJiNTA3MDg0MjZmOThmOTQ0NGUxOTMxZmQ3ZGVkYWFlOWM4OWM1NzlkYWI5ZTFiMDcyYjc1M2FlMjc2MmNhYTVhNWE5ODQ1NGE4In0.eyJhdWQiOiIyMyIsImp0aSI6IjgwYzc3YjJiNTA3MDg0MjZmOThmOTQ0NGUxOTMxZmQ3ZGVkYWFlOWM4OWM1NzlkYWI5ZTFiMDcyYjc1M2FlMjc2MmNhYTVhNWE5ODQ1NGE4IiwiaWF0IjoxNTI2Nzc0NDgxLCJuYmYiOjE1MjY3NzQ0ODEsImV4cCI6MTU1ODMxMDQ4MSwic3ViIjoiMSIsInNjb3BlcyI6W119.L2p_NR0SOsGmiVSDXdMmLKLcQT1u7chNKnl5ZD2TxzF2p1F8gwzmRHO5PNlBIdl1A_agPf6kFXthmHeHYvWtQyd8qADRQjMVwp5DUSbUh1wAKPRBLZsIn7ZahK2lePMz6L8s-t_Pp9Bc5766X6dJrNzTDEsTdMPo0rx8GyzK3oJw6q-4j9C_8BEh0k6clQ0Wq0H5oJN422AWW3C1fOsogO3byFHP8cPshQn5ws4nbF68gofncD2pfX9Em1UxW4WAlCJBt80g_rdIQMm78DDetWGcKPU3YUk5foTpOMnhMs8CjjC7KDDQeHk3i9d-1VljWvaOgLUdEqyYpeq2QhTQhJUVjLbHViymOVCfe8Rx-PEpjaQqVQJ5KZ06xuu2PX_nNe8P8iu3mKjPS5Hn3SQL43lqmZqgiDTdO1peeAkgF0V4hJHNSbs93B_v0XApP2Q7KPtr531zRLuPVv6uwKrywZ2a1pC8Ajaw6_2UKUgaEpXt_bU1iHRMvaB9uIJVyhGc2WBUl6Sipd6L6W-B8EdX8pFiHgaNnPbzq3WCWX94jnwAHXPhWklroa0ECslH9vPK-Jh2qEv3Y27LFFLmyNb5EPOGc_zTTSg7k_xL8Cu5Edi_LpspSzHuezwouHAWQtfU5h0CC1mofLECTo4cdJvozNbz1c5j_d7TuyKlDhLHYow',
                     ]
                 ]);
             event(new LoadDataStatusEvent('Dados Carregados!', $this->id));
             $data = (object) json_decode($response->getBody(), true);
             SaveDataJob::dispatch($data, $this->query, $this->id);
-        }catch (RequestException $e) {
+        }catch (GuzzleException $e) {
             event(new LoadDataStatusEvent('Ocorreu um erro ao buscar os dados em api.programmer.com.br. Favor verificar o log da aplicação para mais detalhes.', $this->id));
             Log::error($e->getMessage());
             Log::error($e->getTraceAsString());

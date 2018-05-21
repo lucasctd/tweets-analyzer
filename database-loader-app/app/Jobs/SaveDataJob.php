@@ -15,6 +15,7 @@ use App\Models\Tweet;
 use Illuminate\Support\Facades\Log;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use App\Exceptions\AppException;
 
 class SaveDataJob implements ShouldQueue
 {
@@ -52,32 +53,27 @@ class SaveDataJob implements ShouldQueue
             $tweetsSalvos = 0;
             foreach ($this->data->data as $tweet){
                 try{
-                    //DB::beginTransaction();
+                    DB::beginTransaction();
                     $tweetJson = (object) $tweet;
-                    $placeId = $this->getPlace($tweetJson);
-                    $tweet = Tweet::make($tweetJson, $placeId);
+                    $tweet = Tweet::make($tweetJson);
                     $tweet->save();
                     $this->saveHashTag($tweet->id);
                     if(isset($tweetJson->entities['hashtags'])){
                         $this->saveSecundaryHashTags($tweet->id, $tweetJson->entities['hashtags']);
                     }
                     $tweetsSalvos++;
-                   // DB::commit();
+                    DB::commit();
                 }catch (Exception $e){
-                   // DB::rollBack();
+                    DB::rollBack();
                     $tweetText = Tweet::getValue('text', $tweetJson) != null ? Tweet::getValue('text', $tweetJson) : Tweet::getValue('full_text', $tweetJson);
                     if($e->getCode() == 23000){
-                        //event(new LoadDataStatusEvent('Tweet de usuário '.$tweet->tweet_owner.' duplicado. Tweet ignorado!', $this->id));
-                        Log::error($e->getMessage());
-                        Log::error($e->getTraceAsString());
 						Log::error('Tweet duplicado: ' . $tweetText);
+						Log::error(AppException::jTraceEx($e));
                         $tweetsDuplicados++;
                     }else{
-                        Log::error($e->getMessage());
-                        Log::error($e->getTraceAsString());
                         Log::error('Erro ao salvar tweet: ' . $tweetText );
+                        Log::error(AppException::jTraceEx($e));
                         $tweetsComErro++;
-                        //event(new LoadDataStatusEvent('Erro ao salvar tweet de usuário '.$tweet->tweet_owner.'. Tweet ignorado!', $this->id));
                     }
                 }
             }
@@ -87,19 +83,6 @@ class SaveDataJob implements ShouldQueue
             Log::error($e->getMessage());
             Log::error($e->getTraceAsString());
         }
-    }
-
-    private function getPlace($tweet) : ?int{
-        if(isset($tweet->place)){
-            try{
-                $place = Place::where('full_name', $tweet->place['full_name'])->firstOrFail();
-            }catch (ModelNotFoundException $e){
-                $place = Place::make((object) $tweet->place);
-                $place->save();
-            }
-            return $place->id;
-        }
-        return null;
     }
 
     private function saveHashTag(int $tweetId){

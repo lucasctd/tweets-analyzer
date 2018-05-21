@@ -10,12 +10,13 @@
     <body>
         <div class="flex-center position-ref full-height">
             <div id="app" class="content">
-
                 <h2>
                     Tweets Loader
                 </h2>
+                <button @click="loadUsersData()">Load Users Data</button> Status: @{{statusUsersLoader}}
+                <br /><br />
                 <button @click="addMore">Add More Data</button>
-                <load-database v-for="n in numberComponents"></load-database>
+                <load-database v-for="hashtag in hashtags" :key="hashtag" :query='"#" + hashtag'></load-database>
             </div>
         </div>
     </body>

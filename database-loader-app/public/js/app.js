@@ -13893,14 +13893,17 @@ window.Vue = __webpack_require__(38);
 
 //Vue.component('example-component', require('./components/ExampleComponent.vue'));
 var tweetsLoaderChannel = Echo.channel('tweets-loader');
+var usersDataLoaderChannel = Echo.channel('user-data-loader');
 Vue.component('load-database', {
     data: function data() {
         return {
-            query: '',
+            queryValue: this.query,
             status: '',
-            count: null
+            count: 1000,
+            show: true
         };
     },
+    props: ['query'],
     methods: {
         load: function load() {
             var that = this;
@@ -13913,19 +13916,40 @@ Vue.component('load-database', {
             }).catch(function (response) {
                 this.status = response.data.error;
             });
+        },
+        remove: function remove() {
+            this.show = false;
         }
     },
-    template: '<div>\n                    <label>Query:</label><input style="margin: 10px" v-model="query" type="text"/>\n                    <label>Count:</label> <input style="margin: 10px" v-model="count" type="number"/>\n                    <button style="margin: 10px" @click="load()">Load on Database</button> Status: {{status}} \n               </div>'
+    template: '<div v-if="show">\n                    <label>Query:</label><input style="margin: 10px" v-model="query" type="text"/>\n                    <label>Count:</label> <input style="margin: 10px" v-model="count" type="number"/>\n                    <button style="margin: 10px" @click="load()">Load on Database</button> \n                    <button style="margin: 10px" @click="remove()">X</button>Status: {{status}} \n               </div>'
 });
 
 var app = new Vue({
     el: '#app',
     data: {
-        numberComponents: 1
+        hashtags: ['alckmin', 'geraldoalckmin', 'alckmin2018', 'geraldoalckmin2018', 'jairbolsonaro', 'bolsonaro', 'bolsonaro2018', 'manueladavila', 'manueladavila2018', 'manuela2018', 'marina2018', 'marinasilva', 'marinasilva2018', 'cirogomes2018', 'ciro2018', 'cirogomes', 'joaoamoedo', 'joaoamoedo2018', 'amoedo2018'],
+        numberComponents: 0,
+        statusUsersLoader: 'Aguardando carregamento.'
     },
+    mounted: function mounted() {
+        this.numberComponents = this.hashtags.length;
+    },
+
     methods: {
         addMore: function addMore() {
             this.numberComponents++;
+        },
+        loadUsersData: function loadUsersData() {
+            var that = this;
+            axios.post('http://tweets-analyzer.wazzu/load-users-data').then(function (response) {
+                that.statusUsersLoader = response.data.message;
+                var event = 'load-user-data-status';
+                usersDataLoaderChannel.listen(event, function (e) {
+                    that.statusUsersLoader = e.status;
+                });
+            }).catch(function (response) {
+                this.statusUsersLoader = response.data.error;
+            });
         }
     }
 });
@@ -13949,9 +13973,9 @@ window.Popper = __webpack_require__(3).default;
  */
 
 try {
-    window.$ = window.jQuery = __webpack_require__(4);
+  window.$ = window.jQuery = __webpack_require__(4);
 
-    __webpack_require__(16);
+  __webpack_require__(16);
 } catch (e) {}
 
 /**
@@ -13989,10 +14013,10 @@ if (token) {
 window.Pusher = __webpack_require__(37);
 
 window.Echo = new __WEBPACK_IMPORTED_MODULE_0_laravel_echo___default.a({
-    broadcaster: 'pusher',
-    key: '450b46c43aed82bb3a76',
-    cluster: 'us2',
-    encrypted: true
+  broadcaster: 'pusher',
+  key: '450b46c43aed82bb3a76',
+  cluster: 'us2',
+  encrypted: true
 });
 
 /***/ }),

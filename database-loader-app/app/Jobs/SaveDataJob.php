@@ -58,13 +58,14 @@ class SaveDataJob implements ShouldQueue
                 try{
                     DB::beginTransaction();
                     $tweetJson = (object) $tweet;
-					try{
-						TweetOwner::where('screen_name', $user->screen_name)->firstOrFail();
+                    $user = (object) $tweetJson->user;
+                    try{
+						$tweetOwner = TweetOwner::where('screen_name', $user->screen_name)->firstOrFail();
 						$usuariosRepetidos++;
 					}catch (ModelNotFoundException $e){
-						
+                        $tweetOwner = $this->saveOwner($user);
 					}
-                    $tweet = Tweet::make($tweetJson);
+                    $tweet = Tweet::make($tweetJson, $tweetOwner->id);
                     $tweet->save();
                     $this->saveHashTag($tweet->id);
                     if(isset($tweetJson->entities['hashtags'])){
@@ -77,20 +78,20 @@ class SaveDataJob implements ShouldQueue
                     $tweetText = Tweet::getValue('text', $tweetJson) != null ? Tweet::getValue('text', $tweetJson) : Tweet::getValue('full_text', $tweetJson);
                     if($e->getCode() == 23000){
 						Log::error('Tweet duplicado: ' . $tweetText);
-						Log::error(AppException::jTraceEx($e));
                         $tweetsDuplicados++;
                     }else{
                         Log::error('Erro ao salvar tweet: ' . $tweetText );
-                        Log::error(AppException::jTraceEx($e));
                         $tweetsComErro++;
                     }
+                    Log::error($e->getMessage());
+                    Log::error(AppException::getTraceAsString($e));
                 }
             }
             event(new LoadDataStatusEvent('Dados persistidos no banco de dados! Tweets salvos: '.$tweetsSalvos.'. Tweets duplicados: '.$tweetsDuplicados.'. Tweets com erro: '.$tweetsComErro, $this->id));
         }catch (Exception $e){
             event(new LoadDataStatusEvent('Ocorreu um erro ao persistir os dados. Favor verificar o log da aplicação para mais detalhes. '. $e->getMessage(), $this->id));
             Log::error($e->getMessage());
-            Log::error($e->getTraceAsString());
+            Log::error(AppException::getTraceAsString($e));
         }
     }
 
@@ -106,24 +107,23 @@ class SaveDataJob implements ShouldQueue
         }
     }
 	
-	private function saveOwner() : TweetOwner{
+	private function saveOwner($user) : TweetOwner{
 		$cityId = null;
 		$stateId = null;
 		$location = explode(',', $user->location);
-		if(count($location) > 1){
-			$cityId = $this->getCity($location[0]);
-			$stateId = $this->getState($location[0]);
-		}
+        $cityId = $this->getCity($location[0]);
+        $stateId = $this->getState($location[0]);
 		$towner = TweetOwner::make($user, $cityId, $stateId);
 		$towner->save();
+		return $towner;
 	}
 	
-	private function getCity($cityName) : int{
+	private function getCity($cityName) : ?int{
         $city = City::where('nome', $cityName)->get();
         return count($city) === 1 ? $city->first()->codigo : null;
     }
 
-    private function getState($cityName) : int{
+    private function getState($cityName) : ?int{
         $state = State::where('nome', $cityName)->get();
         return $state->isNotEmpty() ? $state->first()->codigo : null;
     }

@@ -59,7 +59,7 @@ const app = new Vue({
     el: '#app',
     data:{
         hashtags:[
-            'alckmin', 'geraldoalckmin', 'alckmin2018', 'geraldoalckmin2018', 
+            'alckmin', 'geraldoalckmin', 'alckmin2018',
             'jairbolsonaro', 'bolsonaro', 'bolsonaro2018', 
             'manueladavila', 'manueladavila2018', 'manuela2018', 
             'marina2018', 'marinasilva', 'marinasilva2018', 

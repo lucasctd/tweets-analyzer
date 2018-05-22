@@ -8,49 +8,54 @@
 
 namespace App\Exceptions;
 
+use Exception;
 
 class AppException
 {
-    /**
-     * @param $e
-     * @param null $seen
-     * @return array|string
-     * @see https://hotexamples.com/examples/-/-/jTraceEx/php-jtraceex-function-examples.html
-     */
-    public static function jTraceEx(\Exception $e, $seen=null) {
-        $starter = $seen ? 'Caused by: ' : '';
-        $result = array();
-        if (!$seen) $seen = array();
-        $trace  = $e->getTrace();
-        $prev   = $e->getPrevious();
-        $result[] = sprintf('%s%s: %s', $starter, get_class($e), $e->getMessage());
-        $file = $e->getFile();
-        $line = $e->getLine();
-        while (true) {
-            $current = "$file:$line";
-            if (is_array($seen) && in_array($current, $seen)) {
-                $result[] = sprintf(' ... %d more', count($trace)+1);
-                break;
+    public static function getTraceAsString(Exception $exception) {
+        $rtn = "";
+        $count = 0;
+        foreach ($exception->getTrace() as $frame) {
+            $args = "";
+            if (isset($frame['args'])) {
+                $args = array();
+                foreach ($frame['args'] as $arg) {
+                    if (is_string($arg)) {
+                        $args[] = "'" . $arg . "'";
+                    } elseif (is_array($arg)) {
+                        $args[] = "Array";
+                    } elseif (is_null($arg)) {
+                        $args[] = 'NULL';
+                    } elseif (is_bool($arg)) {
+                        $args[] = ($arg) ? "true" : "false";
+                    } elseif (is_object($arg)) {
+                        $args[] = get_class($arg);
+                    } elseif (is_resource($arg)) {
+                        $args[] = get_resource_type($arg);
+                    } else {
+                        $args[] = $arg;
+                    }
+                }
+                $args = join(", ", $args);
             }
-            $result[] = sprintf(' at %s%s%s(%s%s%s)',
-                count($trace) && array_key_exists('class', $trace[0]) ? str_replace('\\', '.', $trace[0]['class']) : '',
-                count($trace) && array_key_exists('class', $trace[0]) && array_key_exists('function', $trace[0]) ? '.' : '',
-                count($trace) && array_key_exists('function', $trace[0]) ? str_replace('\\', '.', $trace[0]['function']) : '(main)',
-                $line === null ? $file : basename($file),
-                $line === null ? '' : ':',
-                $line === null ? '' : $line);
-            if (is_array($seen))
-                $seen[] = "$file:$line";
-            if (!count($trace))
-                break;
-            $file = array_key_exists('file', $trace[0]) ? $trace[0]['file'] : 'Unknown Source';
-            $line = array_key_exists('file', $trace[0]) && array_key_exists('line', $trace[0]) && $trace[0]['line'] ? $trace[0]['line'] : null;
-            array_shift($trace);
+            $current_file = "[internal function]";
+            if(isset($frame['file']))
+            {
+                $current_file = $frame['file'];
+            }
+            $current_line = "";
+            if(isset($frame['line']))
+            {
+                $current_line = $frame['line'];
+            }
+            $rtn .= sprintf( "#%s %s(%s): %s(%s)\n",
+                $count,
+                $current_file,
+                $current_line,
+                $frame['function'],
+                $args );
+            $count++;
         }
-        $result = join("\n", $result);
-        if ($prev)
-            $result  .= "\n" . self::jTraceEx($prev, $seen);
-
-        return $result;
+        return $rtn;
     }
 }

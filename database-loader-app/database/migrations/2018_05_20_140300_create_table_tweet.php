@@ -14,8 +14,7 @@ class CreateTableTweet extends Migration
     public function up()
     {
         Schema::create('tweet', function (Blueprint $table) {
-            $table->increments('id');
-            $table->bigInteger('tweet_id');
+            $table->bigInteger('id');
             $table->string('id_str', 20);
             $table->string('text', 500);
             $table->integer('favorite_count')->nullable();
@@ -26,8 +25,11 @@ class CreateTableTweet extends Migration
             $table->string('url', 150);
 			$table->timestamp('tweet_created_at');
 			$table->timestamp('created_at')->useCurrent();
-			
-            $table->unsignedInteger('owner_id')->nullable();
+
+			$table->primary('id');
+			$table->index('tweet_created_at');
+
+            $table->bigInteger('owner_id')->nullable();
             $table->foreign('owner_id')->references('id')->on('tweet_owner');
         });
     }

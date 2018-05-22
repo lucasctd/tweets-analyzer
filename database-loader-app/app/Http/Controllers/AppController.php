@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Jobs\LoadDataJob;
 use App\Jobs\LoadUsersDataJob;
-use App\Models\Tweet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mockery\Exception;

@@ -19,7 +19,7 @@ class CreateTableHashtagUsername extends Migration
             $table->boolean('primary');
 			$table->boolean('username');
 
-            $table->integer('tweet_id')->unsigned();
+            $table->bigInteger('tweet_id');
             $table->foreign('tweet_id')->references('id')->on('tweet');
         });
     }

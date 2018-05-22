@@ -12,9 +12,10 @@ class Tweet extends Model
 
     public $table = 'tweet';
     public $timestamps = false;
+    public $incrementing = false;
 
     protected $fillable = [
-        'tweet_id', 'id_str', 'text', 'favorite_count', 'retweet_count','reply_count', 'quote_count','url','tweet_created_at', 'owner_id'
+        'id', 'id_str', 'text', 'favorite_count', 'retweet_count','reply_count', 'quote_count','url','tweet_created_at', 'owner_id'
     ];
 	
 	public static function make(object $data, $ownerId) : Tweet
@@ -22,14 +23,16 @@ class Tweet extends Model
         $text = self::getValue('text', $data);
         $tweet = new Tweet(
             [
-                'tweet_id' => $data->id,
+                'id' => $data->id,
                 'id_str' => $data->id_str,
                 'text' => $text !== null ? $text : self::getValue('full_text', $data),
                 'favorite_count' => $data->favorite_count,
                 'retweet_count' => $data->retweet_count,
                 'reply_count' => self::getValue('reply_count', $data),
                 'quote_count' => self::getValue('quote_count', $data),
+                'followers_count' => self::getValue('followers_count', $data),
                 'url' => 'https://twitter.com/tweeter/status/'.$data->id_str,
+                'owner_id' => $ownerId,
                 //Sat Apr 28 03:18:13 +0000 2018
                 'tweet_created_at' => Carbon::createFromFormat('D M d H:i:s O Y', $data->created_at),
             ]

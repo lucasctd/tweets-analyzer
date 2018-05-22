@@ -15,8 +15,7 @@ class CreateTableTweetOwner extends Migration
     {
         //https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/user-object
         Schema::create('tweet_owner', function (Blueprint $table) {
-            $table->increments('id');
-            $table->bigInteger('user_id');
+            $table->bigInteger('id');
             $table->string('id_str', 50);
             $table->string('name', 100);
             $table->string('screen_name', 100)->unique();
@@ -27,9 +26,10 @@ class CreateTableTweetOwner extends Migration
             $table->integer('friends_count');
             $table->integer('favourites_count');
             $table->integer('statuses_count');
-            $table->integer('user_created_at');
-            $table->boolean('geo_enabled');
+            $table->timestamp('user_created_at');
             $table->timestamp('created_at')->useCurrent();
+
+            $table->primary('id');
 
             $table->integer('city_id')->nullable();
             $table->integer('br_state_id')->nullable();

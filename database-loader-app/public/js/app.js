@@ -13927,7 +13927,7 @@ Vue.component('load-database', {
 var app = new Vue({
     el: '#app',
     data: {
-        hashtags: ['alckmin', 'geraldoalckmin', 'alckmin2018', 'geraldoalckmin2018', 'jairbolsonaro', 'bolsonaro', 'bolsonaro2018', 'manueladavila', 'manueladavila2018', 'manuela2018', 'marina2018', 'marinasilva', 'marinasilva2018', 'cirogomes2018', 'ciro2018', 'cirogomes', 'joaoamoedo', 'joaoamoedo2018', 'amoedo2018'],
+        hashtags: ['alckmin', 'geraldoalckmin', 'alckmin2018', 'jairbolsonaro', 'bolsonaro', 'bolsonaro2018', 'manueladavila', 'manueladavila2018', 'manuela2018', 'marina2018', 'marinasilva', 'marinasilva2018', 'cirogomes2018', 'ciro2018', 'cirogomes', 'joaoamoedo', 'joaoamoedo2018', 'amoedo2018'],
         numberComponents: 0,
         statusUsersLoader: 'Aguardando carregamento.'
     },

@@ -1,0 +1,28 @@
+http://maps.google.com.br/maps/ms?ie=UTF8&source=embed&oe=UTF8&msa=0&msid=113290088680095299476.000484ae6a8849903abd5; http://www.guj.com.br/t/coordenadas-google-maps/10249/9
+Rio Grande do Sul @-30.033914,-51.229154
+Santa Catarina @-27.593237,-48.543736
+Paraná @-25.433171,-49.27147
+Mato Grosso do Sul @-20.461719,-54.612237
+Mato Grosso @-15.598917,-56.094894
+Goiás @-16.67992,-49.255032
+Distrito Federal @-15.79983,-47.863711
+Minas Gerais @-19.918339,-43.940102
+Espirito Santo @-20.319933,-40.336296
+Rio de Janeiro @-22.908892,-43.177138
+São Paulo @-23.550483,-46.633106
+Maranhão @-2.532066,-44.299996
+Piauí @-5.092628,-42.810155
+Ceará @-3.730536,-38.521777
+Rio Grande do Norte @-5.786403,-35.207978
+Paraíba @-7.120034,-34.876211
+Pernambuco @-8.054278,-34.881256
+Alagoas @-9.667137,-35.737958
+Sergipe @-10.912647,-37.053451
+Bahia @-12.970382,-38.512382
+Rondônia @-8.764597,-63.903943
+Acre @-9.972463,-67.812749
+Amazonas @-3.133842,-60.020165
+Roraima @2.821734,-60.672061
+Pará @-1.452005,-48.503072
+Amapá @0.039045,-51.050099
+Tocantins @-10.184567,-48.333654

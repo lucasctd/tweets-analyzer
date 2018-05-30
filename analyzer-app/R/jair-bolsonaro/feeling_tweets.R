@@ -1,45 +1,38 @@
-library(wordcloud)
-library(tm)
-library(plyr)
-library(stringi)
+#library(wordcloud)
+#library(tm)
+library(jsonlite)
+library(httr)
+#library(plyr)
+#library(stringi)
 
 source("database.r")
 
-res <- dbSendQuery(con, "SELECT * FROM tweet tw 
-                   INNER JOIN hashtag_username hu ON tw.id = hu.tweet_id 
-                   WHERE hu.name IN ('#bolsonaro', '#jairbolsonaro', '#bolsonaro2018')")
+res <- dbSendQuery(con, "SELECT tw.id_str as id, tw.text FROM tweet tw 
+                        INNER JOIN hashtag_username hu ON tw.id = hu.tweet_id 
+                        INNER JOIN tweet_owner tw_owner ON tw.owner_id = tw_owner.id
+                        WHERE hu.name IN ('#bolsonaro', '#jairbolsonaro', '#bolsonaro2018')")
 
-result <- fetch(res)
-attach(result)
-value <- sapply(text, function(txt) txt)
-corpus <- Corpus(VectorSource(value))
+tweets <- fetch(res, -1)
+tweets_df <- as.data.frame(tweets)
+#clear
+#tweets_df$text <- iconv(tweets_df$text, "UTF-8", "latin1")
+tweets_df$text <- tolower(tweets_df$text)
+tweets_df$text = gsub('https[^[:space:]]*', '', tweets_df$text);
+tweets_df$text = removePunctuation(tweets_df$text);
+tweets_df$text = gsub("(RT|via)((?:\\b\\W*@\\w+)+)", " ",  tweets_df$text);
+tweets_df$text = gsub(":", "", tweets_df$text);
+# remove unnecessary spaces
+tweets_df$text = gsub("[ \t]{2,}", "", tweets_df$text)
+tweets_df$text = gsub("^\\s+|\\s+$", "", tweets_df$text)
 
-corpus <- tm_map(corpus, content_transformer(tolower))
-corpus <- tm_map(corpus, content_transformer(function(x) gsub("https[^[:space:]]*", "", x)))
-corpus <- tm_map(corpus, removePunctuation)
-corpus <- tm_map(corpus, function(x)removeWords(x,stopwords("pt")))
-corpus <- tm_map(corpus, function(x)removeWords(x,c("ter", "olho", "til", "azul", "vai", "pra", "chama", 
-                                                    "gorda", "vaqueiro", "diz", "estamos", "pre", "ser", "faz", "nenhuma",
-                                                    "163", "sao", "art", "tudo")))
-corpus <- tm_map(corpus, content_transformer(function(x) iconv(x, "UTF-8", "latin1")))
+tweets_df["language"] = "pt";
+#tweets_df["id"] = seq.int(nrow(tweets_df));
 
-wordcloud(corpus, min.freq = 10, max.words = 100, random.order = F)
+#convert to JSON
+json_data <- toJSON(list(documents = tweets_df))
+result_twitter_sentimental = POST("https://westcentralus.api.cognitive.microsoft.com/text/analytics/v2.0/sentiment", 
+                                  body = json_data, 
+                                  add_headers(.headers = c("Content-Type"="application/json", 
+                                                           "Ocp-Apim-Subscription-Key"= '499f10034b9a4fe085452b21714c086d')))
 
-tdm <- TermDocumentMatrix(corpus)
-
-tdm <- removeSparseTerms(tdm, sparse = 0.97)
-
-df <- as.data.frame(inspect(tdm))
-
-(freq.terms <- findFreqTerms(tdm, lowfreq = 10))
-
-term.freq <- rowSums(as.matrix(tdm))
-term.freq <- subset(term.freq, term.freq >= 20)
-df <- data.frame(term = names(term.freq), freq = term.freq)
-
-ggplot(df, aes(x=term, y=freq)) + geom_bar(stat="identity") +
-  xlab("Terms") + ylab("Count") + coord_flip() +
-  theme(axis.text=element_text(size=7))
-
-findAssocs(tdm, "bolsonaro", 0.2)
-plot(tdm, term = freq.terms, corThreshold = 0.1, weighting = T)
+#wordcloud(corpus, min.freq = 10, max.words = 100, random.order = F)

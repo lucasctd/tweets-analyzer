@@ -1,8 +1,6 @@
 #map bolsonaro's followers
 library(plotly)
 library(magrittr)
-library(maps)
-
 
 source("database.r", local = TRUE)
 
@@ -16,8 +14,8 @@ data <- fetch(res, n = -1)
 
 dataFrame <- data.frame("longitude" = data$LONGITUDE, "latitude" = data$LATITUDE, "local" = data$LOCAL, "quantidade" = data$quantidade)
 
-dataFrame$q <- with(dataFrame, cut(quantidade, breaks = c(0, 100, 200, 250)))
-levels(dataFrame$q) <- paste(c("0 - 100", "100 - 200", "200 - 250"), "seguidor(es)")
+dataFrame$q <- with(dataFrame, cut(quantidade, breaks = c(0, 10, 150, 300)))
+levels(dataFrame$q) <- paste(c("0 - 10", "10 - 150", "150 - 300"), "seguidor(es)")
 dataFrame$q <- as.ordered(dataFrame$q)
 
 geo <- list(
@@ -32,4 +30,4 @@ p <- plot_geo(dataFrame, sizes = c(5, 300), width = 1024, height = 600) %>%
     x = ~longitude, y = ~latitude, size = ~quantidade, color = ~q,
     text = ~paste(dataFrame$local, " - ", dataFrame$quantidade, 'seguidor(es)')
   )%>%
-layout(title = 'Seguidores de Bolsonaro - Maio/Junho - 2018', geo = geo)
+layout(title = 'Seguidores de Bolsonaro - Brasil - Maio/Junho - 2018', geo = geo)

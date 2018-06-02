@@ -9,12 +9,22 @@ result <- fetch(res, n = -1)
 attach(result)
 
 cores <- c("red", "orange", "blue", "yellow", "green", "gray")
-pre_candidatos <- c("Geraldo Alckmin", "Jair Bolsonaro", "Manuela D'Ávila", "Marina Silva", "Ciro Gomes", "João Amoêdo")
+pre_candidatos <- c("Geraldo Alckmin", "Jair Bolsonaro", "Manuela D'Ãvila", "Marina Silva", "Ciro Gomes", "JoÃ£o AmoÃªdo")
 data <- c(GERALDO_ALCKMIN, JAIR_BOLSONARO, MANUELA_DAVILA, MARINA_SILVA, CIRO_GOMES, JOAO_AMOEDO)
 labels <- paste(round(data/sum(data)*100, 4), '%', sep = '')
 
 dataFrame <- data.frame(pre_candidatos, data)
 
-p <- plot_ly(dataFrame, labels = ~pre_candidatos, values = ~data, type = 'pie') %>% layout(title = 'Tweets por Pré-candidato',
+#pie
+p <- plot_ly(dataFrame, labels = ~pre_candidatos, values = ~data, type = 'pie') %>% layout(title = 'Tweets por PrÃ©-candidato',
          xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+#bar
+
+p <- plot_ly(
+  x = pre_candidatos,
+  y = data,
+  name = "Tweets por PrÃ©-candidato",
+  type = "bar"
+)

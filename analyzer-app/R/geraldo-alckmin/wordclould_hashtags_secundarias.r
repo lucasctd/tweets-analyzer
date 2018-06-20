@@ -1,4 +1,4 @@
 #Hashtags secundárias
-source("shared/wordclould_hashtags_secundarias.r")
+source("shared/wordcloud_hashtags_secundarias.r")
 
-getWorldcloudHashtagsSecundarias('alckmin', 'geraldoalckmin', 'alckmin2018')
+wordcloudHashtagsSecundarias(c('alckmin', 'geraldoalckmin', 'alckmin2018', 'alckminpresidente', 'geraldoalckminpresidente'), 5, 150)

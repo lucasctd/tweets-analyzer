@@ -9,6 +9,7 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Carbon\Carbon;
 
 class LoadUserDataStatusEvent implements ShouldBroadcast
 {
@@ -20,11 +21,10 @@ class LoadUserDataStatusEvent implements ShouldBroadcast
      * Create a new event instance.
      *
      * @param $status
-     * @param $id
      */
     public function __construct($status)
     {
-        $this->status = $status;
+        $this->status = $status .' ('.Carbon::now('America/Bahia').')';
     }
 
     /**

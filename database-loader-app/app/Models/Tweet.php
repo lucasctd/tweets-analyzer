@@ -15,7 +15,7 @@ class Tweet extends Model
     public $incrementing = false;
 
     protected $fillable = [
-        'id', 'id_str', 'text', 'favorite_count', 'retweet_count','reply_count', 'quote_count','url','tweet_created_at', 'owner_id'
+        'id', 'id_str', 'text', 'favorite_count', 'retweet_count','reply_count', 'quote_count','url','tweet_created_at', 'owner_id', 'sentiment_id'
     ];
 	
 	public static function make(object $data, $ownerId) : Tweet
@@ -43,6 +43,10 @@ class Tweet extends Model
     public function owner()
     {
         return $this->belongsTo('App\Models\TweetOwner', 'owner_id', 'id');
+    }
+
+    public function sentiment(){
+        return $this->hasOne('App\Models\Sentiment', 'id', 'sentiment_id');
     }
 
 }

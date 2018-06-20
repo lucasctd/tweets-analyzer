@@ -13894,20 +13894,31 @@ window.Vue = __webpack_require__(38);
 //Vue.component('example-component', require('./components/ExampleComponent.vue'));
 var tweetsLoaderChannel = Echo.channel('tweets-loader');
 var usersDataLoaderChannel = Echo.channel('user-data-loader');
+var sentimentsLoaderChannel = Echo.channel('sentiments-loader');
+
 Vue.component('load-database', {
     data: function data() {
         return {
-            queryValue: this.query,
-            status: '',
+            status: 'Aguardando ação do usuário.',
             count: 1000,
+            fromDate: '20180520',
+            toDate: '20180611',
             show: true
         };
     },
-    props: ['query'],
+    props: ['premium', 'precandidato'],
     methods: {
         load: function load() {
             var that = this;
-            axios.post('http://tweets-analyzer.wazzu/load-data?query=' + this.query.replace('#', '%23').replace('@', '%40') + '&count=' + this.count).then(function (response) {
+            axios.post('http://tweets-analyzer.wazzu/load-data', {
+                premium: this.premium,
+                query: this.query,
+                count: this.count,
+                fromDate: (this.fromDate + '0000').replace('-', '').replace('-', ''),
+                toDate: (this.toDate + '0000').replace('-', '').replace('-', ''),
+                precandidato: this.precandidato.id,
+                XDEBUG_SESSION_START: 'vscode'
+            }).then(function (response) {
                 that.status = response.data.message;
                 var event = '.load-data-status-' + response.data.eventId;
                 tweetsLoaderChannel.listen(event, function (e) {
@@ -13921,34 +13932,48 @@ Vue.component('load-database', {
             this.show = false;
         }
     },
-    template: '<div v-if="show">\n                    <label>Query:</label><input style="margin: 10px" v-model="query" type="text"/>\n                    <label>Count:</label> <input style="margin: 10px" v-model="count" type="number"/>\n                    <button style="margin: 10px" @click="load()">Load on Database</button> \n                    <button style="margin: 10px" @click="remove()">X</button>Status: {{status}} \n               </div>'
+    template: '<div v-if="show">\n                    <label style="width: 250px; display: inline-block;">Pr\xE9-Candidato: {{precandidato.nome}}</label>\n                    <label>Count:</label> <input style="margin: 10px" v-model="count" type="number"/>\n                    <span v-if="premium === \'1\'">\n                        <label>From Date:</label> <input type="date" style="margin: 10px" v-model="fromDate" pattern="[0-9]{4}[0-9]{2}[0-9]{2}"/>\n                        <label>To Date:</label> <input type="date" style="margin: 10px" v-model="toDate" pattern="[0-9]{4}[0-9]{2}[0-9]{2}"/>\n                    </span>\n                    <button style="margin: 10px" @click="load()">Load on Database</button> \n                    <button style="margin: 10px" @click="remove()">X</button> <br />Status: {{status}}\n                    <div style="width:100%; height:1px; background-color: black; margin-top: 15px; margin-bottom: 10px;"> </div>\n               </div>'
 });
 
 var app = new Vue({
     el: '#app',
     data: {
-        hashtags: ['alckmin', 'geraldoalckmin', 'alckmin2018', 'jairbolsonaro', 'bolsonaro', 'bolsonaro2018', 'manueladavila', 'manueladavila2018', 'manuela2018', 'marina2018', 'marinasilva', 'marinasilva2018', 'cirogomes2018', 'ciro2018', 'cirogomes', 'joaoamoedo', 'joaoamoedo2018', 'amoedo2018'],
-        numberComponents: 0,
-        statusUsersLoader: 'Aguardando carregamento.'
+        precandidatos: [],
+        statusUsersLoader: 'Aguardando ação do usuário.',
+        loadSentimentsStatus: 'Aguardando ação do usuário.',
+        showBasicSearch: false,
+        showPremiumSearch: false
     },
     mounted: function mounted() {
-        this.numberComponents = this.hashtags.length;
+        var that = this;
+        axios.get('http://tweets-analyzer.wazzu/precandidatos').then(function (response) {
+            that.precandidatos = response.data;
+        });
     },
 
     methods: {
-        addMore: function addMore() {
-            this.numberComponents++;
-        },
         loadUsersData: function loadUsersData() {
             var that = this;
             axios.post('http://tweets-analyzer.wazzu/load-users-data').then(function (response) {
                 that.statusUsersLoader = response.data.message;
-                var event = 'load-user-data-status';
+                var event = '.load-user-data-status';
                 usersDataLoaderChannel.listen(event, function (e) {
                     that.statusUsersLoader = e.status;
                 });
             }).catch(function (response) {
                 this.statusUsersLoader = response.data.error;
+            });
+        },
+        loadSentiments: function loadSentiments() {
+            var that = this;
+            axios.post('http://tweets-analyzer.wazzu/analyze-sentiment').then(function (response) {
+                that.loadSentimentsStatus = response.data.message;
+                var event = '.sentiments';
+                sentimentsLoaderChannel.listen(event, function (e) {
+                    that.loadSentimentsStatus = e.status;
+                });
+            }).catch(function (response) {
+                this.loadSentimentsStatus = response.data.error;
             });
         }
     }
@@ -36507,6 +36532,88 @@ var SocketIoPresenceChannel = function (_SocketIoPrivateChann) {
     return SocketIoPresenceChannel;
 }(SocketIoPrivateChannel);
 
+var NullChannel = function (_Channel) {
+    inherits(NullChannel, _Channel);
+
+    function NullChannel() {
+        classCallCheck(this, NullChannel);
+        return possibleConstructorReturn(this, (NullChannel.__proto__ || Object.getPrototypeOf(NullChannel)).apply(this, arguments));
+    }
+
+    createClass(NullChannel, [{
+        key: 'subscribe',
+        value: function subscribe() {}
+    }, {
+        key: 'unsubscribe',
+        value: function unsubscribe() {}
+    }, {
+        key: 'listen',
+        value: function listen(event, callback) {
+            return this;
+        }
+    }, {
+        key: 'stopListening',
+        value: function stopListening(event) {
+            return this;
+        }
+    }, {
+        key: 'on',
+        value: function on(event, callback) {
+            return this;
+        }
+    }]);
+    return NullChannel;
+}(Channel);
+
+var NullPrivateChannel = function (_NullChannel) {
+    inherits(NullPrivateChannel, _NullChannel);
+
+    function NullPrivateChannel() {
+        classCallCheck(this, NullPrivateChannel);
+        return possibleConstructorReturn(this, (NullPrivateChannel.__proto__ || Object.getPrototypeOf(NullPrivateChannel)).apply(this, arguments));
+    }
+
+    createClass(NullPrivateChannel, [{
+        key: 'whisper',
+        value: function whisper(eventName, data) {
+            return this;
+        }
+    }]);
+    return NullPrivateChannel;
+}(NullChannel);
+
+var NullPresenceChannel = function (_NullChannel) {
+    inherits(NullPresenceChannel, _NullChannel);
+
+    function NullPresenceChannel() {
+        classCallCheck(this, NullPresenceChannel);
+        return possibleConstructorReturn(this, (NullPresenceChannel.__proto__ || Object.getPrototypeOf(NullPresenceChannel)).apply(this, arguments));
+    }
+
+    createClass(NullPresenceChannel, [{
+        key: 'here',
+        value: function here(callback) {
+            return this;
+        }
+    }, {
+        key: 'joining',
+        value: function joining(callback) {
+            return this;
+        }
+    }, {
+        key: 'leaving',
+        value: function leaving(callback) {
+            return this;
+        }
+    }, {
+        key: 'whisper',
+        value: function whisper(eventName, data) {
+            return this;
+        }
+    }]);
+    return NullPresenceChannel;
+}(NullChannel);
+
 var PusherConnector = function (_Connector) {
     inherits(PusherConnector, _Connector);
 
@@ -36678,6 +36785,62 @@ var SocketIoConnector = function (_Connector) {
     return SocketIoConnector;
 }(Connector);
 
+var NullConnector = function (_Connector) {
+    inherits(NullConnector, _Connector);
+
+    function NullConnector() {
+        var _ref;
+
+        classCallCheck(this, NullConnector);
+
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+        }
+
+        var _this = possibleConstructorReturn(this, (_ref = NullConnector.__proto__ || Object.getPrototypeOf(NullConnector)).call.apply(_ref, [this].concat(args)));
+
+        _this.channels = {};
+        return _this;
+    }
+
+    createClass(NullConnector, [{
+        key: 'connect',
+        value: function connect() {}
+    }, {
+        key: 'listen',
+        value: function listen(name, event, callback) {
+            return new NullChannel();
+        }
+    }, {
+        key: 'channel',
+        value: function channel(name) {
+            return new NullChannel();
+        }
+    }, {
+        key: 'privateChannel',
+        value: function privateChannel(name) {
+            return new NullPrivateChannel();
+        }
+    }, {
+        key: 'presenceChannel',
+        value: function presenceChannel(name) {
+            return new NullPresenceChannel();
+        }
+    }, {
+        key: 'leave',
+        value: function leave(name) {}
+    }, {
+        key: 'socketId',
+        value: function socketId() {
+            return 'fake-socket-id';
+        }
+    }, {
+        key: 'disconnect',
+        value: function disconnect() {}
+    }]);
+    return NullConnector;
+}(Connector);
+
 var Echo = function () {
     function Echo(options) {
         classCallCheck(this, Echo);
@@ -36696,6 +36859,8 @@ var Echo = function () {
             this.connector = new PusherConnector(this.options);
         } else if (this.options.broadcaster == 'socket.io') {
             this.connector = new SocketIoConnector(this.options);
+        } else if (this.options.broadcaster == 'null') {
+            this.connector = new NullConnector(this.options);
         }
     }
 

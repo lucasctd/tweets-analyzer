@@ -13,8 +13,19 @@
                 <h2>
                     Tweets Loader
                 </h2>
-                <button @click="addMore">Add More Data</button>
-                <load-database v-for="hashtag in hashtags" :key="hashtag" :query='"#" + hashtag'></load-database>
+                <span>
+                    <button @click="loadSentiments">Analisar Sentimentos</button>
+                    <span>Status: @{{loadSentimentsStatus}}</span>
+                </span>
+                <br /><br />
+                <button @click="showPremiumSearch = !showPremiumSearch">@{{!showPremiumSearch ? 'Show' : 'Hide'}} Premium Search</button>
+                <button @click="showBasicSearch = !showBasicSearch">@{{!showBasicSearch ? 'Show' : 'Hide'}} Basic Search</button>
+                <div v-if='showPremiumSearch'>
+                    <load-database v-for="precandidato in precandidatos" :key="precandidato.id" :precandidato='precandidato' premium="1"></load-database>
+                </div>
+                <div v-if='showBasicSearch'>
+                    <load-database v-for="precandidato in precandidatos" :key="precandidato.id" :precandidato="precandidato" premium='0'></load-database>
+                </div>
             </div>
         </div>
     </body>

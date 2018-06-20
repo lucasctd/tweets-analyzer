@@ -1,4 +1,4 @@
 #Hashtags secundárias
-source("shared/wordclould_hashtags_secundarias.r")
+source("shared/wordcloud_hashtags_secundarias.r")
 
-getWorldcloudHashtagsSecundarias('jairbolsonaro', 'bolsonaro', 'bolsonaro2018')
+wordcloudHashtagsSecundarias(c('jairbolsonaro', 'bolsonaro', 'bolsonaro2018', 'jairbolsonaropresidente', 'bolsonaropresidente'), 15, 100)

@@ -3,6 +3,7 @@ library(RMySQL)
 killDbConnections <- function () {
 
   all_cons <- dbListConnections(MySQL())
+  length(all_cons)> 0
 
   print(all_cons)
 

@@ -47,7 +47,7 @@ class LoadUsersDataJob implements ShouldQueue
                 array_push($usersData, $this->getUsersData(implode(',', $block), $client));
                 event(new LoadUserDataStatusEvent('Dados do bloco usuários #'.$blockNumber++.' carregados. Número de usuários: '. count($block)));
             }
-            event(new LoadUserDataStatusEvent('Os dados de todos os usu[arios foram carregados.'));
+            event(new LoadUserDataStatusEvent('Os dados de todos os usuários foram carregados.'));
         } catch (GuzzleException $e) {
             event(new LoadUserDataStatusEvent('Ocorreu um erro ao buscar os dados em api.programmer.com.br. Favor verificar o log da aplicação para mais detalhes.'));
             Log::error($e->getMessage());

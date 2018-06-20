@@ -1,4 +1,4 @@
 #Hashtags secundárias
-source("shared/wordclould_hashtags_secundarias.r")
+source("shared/wordcloud_hashtags_secundarias.r")
 
-getWorldcloudHashtagsSecundarias('manueladavila', 'manueladavila2018', 'manuela2018')
+wordcloudHashtagsSecundarias(c('manueladavila', 'manueladavila2018', 'manuela2018', 'manueladavilapresidente', 'manuelapresidente'), 2, 100)

@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Events\LoadDataStatusEvent;
-use App\Models\HashTagUserName;
+use App\Models\Hashtag;
 use Illuminate\Bus\Queueable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Queue\SerializesModels;
@@ -24,20 +24,20 @@ class SaveDataJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $data;
-    public $hashtag;
+    public $precandidatoId;
     public $id;
 
     /**
      * Create a new job instance.
      *
      * @param $data
-     * @param $hashtag
+     * @param $precandidatoId
      * @param $id
      */
-    public function __construct($data, $hashtag, $id)
+    public function __construct($data, $precandidatoId, $id)
     {
         $this->data = $data;
-        $this->hashtag = $hashtag;
+        $this->precandidatoId = $precandidatoId;
         $this->id = $id;
     }
 
@@ -67,9 +67,8 @@ class SaveDataJob implements ShouldQueue
 					}
                     $tweet = Tweet::make($tweetJson, $tweetOwner->id);
                     $tweet->save();
-                    $this->saveHashTag($tweet->id);
                     if(isset($tweetJson->entities['hashtags'])){
-                        $this->saveSecundaryHashTags($tweet->id, $tweetJson->entities['hashtags']);
+                        $this->saveHashtags($tweet->id, $tweetJson->entities['hashtags']);
                     }
                     $tweetsSalvos++;
                     DB::commit();
@@ -77,14 +76,12 @@ class SaveDataJob implements ShouldQueue
                     DB::rollBack();
                     $tweetText = Tweet::getValue('text', $tweetJson) != null ? Tweet::getValue('text', $tweetJson) : Tweet::getValue('full_text', $tweetJson);
                     if($e->getCode() == 23000){
-						Log::error('Tweet duplicado: ' . $tweetText);
                         $tweetsDuplicados++;
                     }else{
-                        Log::error('Erro ao salvar tweet: ' . $tweetText );
                         $tweetsComErro++;
+                        Log::error($e->getMessage());
+                        Log::error(AppException::getTraceAsString($e));
                     }
-                    Log::error($e->getMessage());
-                    Log::error(AppException::getTraceAsString($e));
                 }
             }
             event(new LoadDataStatusEvent('Dados persistidos no banco de dados! Tweets salvos: '.$tweetsSalvos.'. Tweets duplicados: '.$tweetsDuplicados.'. Tweets com erro: '.$tweetsComErro, $this->id));
@@ -95,14 +92,9 @@ class SaveDataJob implements ShouldQueue
         }
     }
 
-    private function saveHashTag(int $tweetId){
-        $hashTag = HashTagUserName::make($this->hashtag, true, strpos($this->hashtag, '@'), $tweetId);
-        $hashTag->save();
-    }
-
-    private function saveSecundaryHashTags(int $tweetId, array $hashTags){
+    private function saveHashtags(int $tweetId, array $hashTags){
         foreach ($hashTags as $hashTag){
-            $hashTag = HashTagUserName::make($hashTag['text'], false, false, $tweetId);
+            $hashTag = Hashtag::make('#' . $hashTag['text'], $tweetId, $this->precandidatoId);
             $hashTag->save();
         }
     }

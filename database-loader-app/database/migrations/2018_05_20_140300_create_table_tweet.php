@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 
 class CreateTableTweet extends Migration
 {
@@ -23,8 +24,8 @@ class CreateTableTweet extends Migration
             $table->integer('quote_count')->nullable();
 			$table->string('followers_count')->nullable();
             $table->string('url', 150);
-			$table->timestamp('tweet_created_at');
-			$table->timestamp('created_at')->useCurrent();
+			$table->timestamp('tweet_created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+			$table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
 
 			$table->primary('id');
 			$table->index('tweet_created_at');

@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "programmer.com.br:api-project-13216112845",
+  "private_key_id": "f2928c47ae9bb06a39cd632d0242a60a2931b463",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDdNegeoQZPBvtL\nUD5eJ3/Ke9yQRGmhzG+Mrl1CsDoFBT00/nwkl0N1AYc/A/a4MrN7Y4ZP1x0HPS0b\ndxjcpq3da+rvDayB7uPQ+tPJsBSO16aDbQKHTEGkTq2u4zBrIOjW3NLlpvf7zpmH\nav9eU0hajlxkcrcgneK4v9KAqdH3q3WBLQQcvnSOF0DzSaj0U2xNbjr6X8PcXxan\nX4vpGaKV/EC7vGQAXQU/K6JosMRjl/lJm+s6v+6CF3TvaRB0Glhqb/2/GO/vC/7G\naZR8nfObxdAESxnfNg6EBpExgTwEGiSW1XhtRjXTP/pBpwh3ZfdCQhlN1zopv3F7\nKT4LVIpjAgMBAAECggEAB7L9njtKheufSXLEiPBlAT4oYhkPeCMuar4S3uRVUKFr\nDPIijf95yJPCCk5wAt844f2HyjWZfAwECuWtRtjCSmecKK/YJjmTUk24m1d2j7Yv\nxHlB0kW0LyzR3LlpkQD3Oas75+RU0z3QmCcANl89sHEuBAz+FLOKFZYPlIzUkwMj\nJLFtV40NPCwHUBrz9hbNj0j2wXKj4NrB1dwneeq3M9feGWTZruyvzpVq7jmacRU/\nMnlUPHXhTm02oMRJjG+C81XSKIaS9ME+hg/yYpoSb1y4YVLf/cRJBrQ3zkfssCtU\nV16HEe+2bwDDp54JHAUItL93L14Tp8HPZgAafvxx0QKBgQD0ROkejAL94FG7MI9x\nMQbIUtW9vJVLqtjA6DKmEPb6uxRncdqlUBgeKk2Bno9AMmoikUv9CRfrbe9LGszr\nv6hUVdlA1xlcNAUK2TBxCnwROnZCfyLxG2GZV5Y2iPst4vZvRG5E8Ccic5FQitfe\nYztrX5CAFgj91iZX1egp8WgsiwKBgQDn1YJn3lou01briiIGQ5s981qlJkpDudCO\nBIkdR1XR4RIN5VP849qmSymaJuLtuZNDumK0pJF6y5jWcdsR4Y5BQ4b4WZtM4Cc+\nhrP7UU84v+eLC85WtTVy7h99gZwOV+gOWvKLFuckk7xIB6aRNprrwXQ3JXuEvAiH\nUSLx3FCciQKBgQCwj5rdfKCw91K8dmZIkAJyDAX5RnW3ov9XuL7bcInFRDKEbzR2\np4U3UKaDWaP76DT1VYbSmJ8UinscE3wpr3gxtXf6uT/YeLVoWQL9wnFZVqOifxk3\no+4RE9E9DBha26H7XUBDTj9LVLOlvyY31gxeGU5udv76068VcEWHA7qj7wKBgDup\npO/aN1dJqFrhp7P4/iDJWhCadA5N6bBC1o6kZx+mTqEo3Z59fS3CtignzcrkMVQC\nyZg3qgDyGJlHn9tQMu301O1hEiiMn0zmGbeZy0uNh6cvGKET7XdwdMY17tV6Jgxb\nt4O4FzBAnPnkjidc6C24EZKHoOweAAvjA50+17gRAoGARrY2sLIsfIBzocjI6fAN\nhYRW766VDfC881jWxVioSBHHDEPDsYjL0g6SqX24zU4zXPKHxXMdRnAbXsuZ7+Ix\n74MHTx66Hwh3sPsYECtZhjIOx2Wwxp5YI6HEy4tpH94DjGjZBeI1sldH+TqQD37r\naKWWHFDInu7Q/XgfH+vIdac=\n-----END PRIVATE KEY-----\n",
+  "client_email": "starting-account-4ytkttrelgal@api-project-13216112845.programmer.com.br.iam.gserviceaccount.com",
+  "client_id": "114456787223064315226",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/starting-account-4ytkttrelgal%40api-project-13216112845.programmer.com.br.iam.gserviceaccount.com"
+}

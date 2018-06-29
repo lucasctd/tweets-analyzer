@@ -7,7 +7,7 @@ source("all/functions.r")
 getTop5HashtagsPerUser = function(username){
   query = "SELECT hu.name AS name, COUNT(hu.name) AS qtd FROM tweet_owner towner
           INNER JOIN tweet tw ON towner.id = tw.owner_id
-          INNER JOIN hashtag_username hu ON tw.id = hu.tweet_id
+          INNER JOIN hashtag hu ON tw.id = hu.tweet_id
           WHERE towner.screen_name = 'param'
           GROUP BY name
           ORDER BY qtd DESC"

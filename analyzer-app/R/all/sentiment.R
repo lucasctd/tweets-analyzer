@@ -14,17 +14,17 @@ totalTweets <- fetch(res, -1)
 
 #get sentiment
 
-sentimentBolsonaro <- groupAndCount(getSentiment(c('jairbolsonaro', 'bolsonaro', 'bolsonaro2018', 'jairbolsonaropresidente', 'bolsonaropresidente')))
+sentimentBolsonaro <- groupAndCount(getSentiment(2))
 
-sentimentCiro <- groupAndCount(getSentiment(c('cirogomes2018', 'ciro2018', 'cirogomes', 'ciropresidente', 'cirogomespresidente')))
+sentimentCiro <- groupAndCount(getSentiment(5))
 
-sentimentAlckmin <- groupAndCount(getSentiment(c('alckmin', 'geraldoalckmin', 'alckmin2018', 'alckminpresidente', 'geraldoalckminpresidente')))
+sentimentAlckmin <- groupAndCount(getSentiment(1))
 
-sentimentMarina <- groupAndCount(getSentiment(c('marina2018', 'marinasilva', 'marinasilva2018', 'marinapresidente', 'cirogomespresidente')))
+sentimentMarina <- groupAndCount(getSentiment(4))
 
-sentimentManuela <- groupAndCount(getSentiment(c('manueladavila', 'manueladavila2018', 'manuela2018', 'manueladavilapresidente', 'manuelapresidente')))
+sentimentManuela <- groupAndCount(getSentiment(3))
 
-sentimentAmoedo <- groupAndCount(getSentiment(c('joaoamoedo', 'joaoamoedo2018', 'amoedo2018', 'joaoamoedopresidente', 'amoedopresidente', 'JoaoAmoedoNaJovemPan')))
+sentimentAmoedo <- groupAndCount(getSentiment(6))
 
 sentiments <- matrix(c(sentimentBolsonaro, sentimentCiro, sentimentAlckmin, sentimentMarina, sentimentManuela, sentimentAmoedo), nrow = 3, byrow = FALSE)
 
@@ -36,8 +36,20 @@ precandidatos = c(concatNameTweets('Jair Bolsonaro', totalTweets$JAIR_BOLSONARO)
                   concatNameTweets('Geraldo Alckmin', totalTweets$GERALDO_ALCKMIN), concatNameTweets('Marina Silva', totalTweets$MARINA_SILVA), 
                   concatNameTweets('Manuela D\'\u00c1vila', totalTweets$MANUELA_DAVILA), concatNameTweets('Jo\u00e3o Amo\u00eado', totalTweets$JOAO_AMOEDO))
 
+
+hide <- list(
+  title = "",
+  zeroline = FALSE,
+  showline = FALSE,
+  showticklabels = FALSE,
+  showgrid = FALSE
+)
+
 p <- plot_ly(x = precandidatos, y = ruim, type = 'bar', 
              name = 'Ruim', marker = list(color = red), text = paste(round(ruim, 2), '%', sep = ''), textposition = 'auto') %>%
   add_trace(y = neutro, name = 'Neutro', marker = list(color = orange), text = paste(round(neutro, 2), '%', sep = ''), textposition = 'auto') %>%
   add_trace(y = bom, name = 'Bom', marker = list(color = green), text = paste(round(bom, 2), '%', sep = ''), textposition = 'auto') %>%
-  layout(title = 'An\u00e1lise de Sentimento por Pr\u00e9-candidato', yaxis = list(title = '%'), xaxis = list(title = 'Pr\u00e9-candidatos'), barmode = 'stack')
+  layout(title = 'An\u00e1lise de Sentimento por Pr\u00e9-candidato', 
+         yaxis = list(title = '%', showticklabels = FALSE), 
+         xaxis = list(title = 'Pr\u00e9-candidatos'), 
+         barmode = 'stack')

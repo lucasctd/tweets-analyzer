@@ -1,39 +1,33 @@
 CREATE OR REPLACE VIEW V_QUANTIDADE_TWEETS_CANDIDATO AS 
 SELECT (
-	SELECT COUNT(tw.id)
+	SELECT COUNT(distinct tw.id)
 	FROM tweet tw 
-	INNER JOIN hashtag_username hu ON tw.id = hu.tweet_id AND hu.primary = 1
-	WHERE hu.name IN ('#alckmin', '#geraldoalckmin', '#alckmin2018', '#alckminpresidente', '#geraldoalckminpresidente')
+	WHERE tw.precandidato_id = 1
 ) AS GERALDO_ALCKMIN,
 (
-	SELECT COUNT(tw.id)
+	SELECT COUNT(distinct tw.id)
 	FROM tweet tw 
-	INNER JOIN hashtag_username hu ON tw.id = hu.tweet_id AND hu.primary = 1
-	WHERE hu.name IN ('#jairbolsonaro', '#bolsonaro', '#bolsonaro2018', '#jairbolsonaropresidente', '#bolsonaropresidente')
+	WHERE tw.precandidato_id = 2
 ) AS JAIR_BOLSONARO,
 (
-	SELECT COUNT(tw.id)
-	FROM tweet tw 
-	INNER JOIN hashtag_username hu ON tw.id = hu.tweet_id AND hu.primary = 1
-	WHERE hu.name IN ('#manueladavila','#manueladavila2018', '#manuela2018', '#manuela2018', '#manuelapresidente')
+	SELECT COUNT(distinct tw.id)
+	FROM tweet tw
+	WHERE tw.precandidato_id = 3
 ) AS MANUELA_DAVILA,
 (
-	SELECT COUNT(tw.id)
+	SELECT COUNT(distinct tw.id)
 	FROM tweet tw 
-	INNER JOIN hashtag_username hu ON tw.id = hu.tweet_id AND hu.primary = 1
-	WHERE hu.name IN ('#marina2018', '#marinasilva', '#marinasilva2018', '#marinapresidente', '#marinasilvapresidente')
+	WHERE tw.precandidato_id = 4
 ) AS MARINA_SILVA,
 (
-	SELECT COUNT(tw.id)
+	SELECT COUNT(distinct tw.id)
 	FROM tweet tw 
-	INNER JOIN hashtag_username hu ON tw.id = hu.tweet_id AND hu.primary = 1
-	WHERE hu.name IN ('#cirogomes2018', '#ciro2018', '#cirogomes', '#ciropresidente', '#cirogomespresidente')
+	WHERE tw.precandidato_id = 5
 ) AS CIRO_GOMES,
 (
-	SELECT COUNT(tw.id)
+	SELECT COUNT(distinct tw.id)
 	FROM tweet tw 
-	INNER JOIN hashtag_username hu ON tw.id = hu.tweet_id AND hu.primary = 1
-	WHERE hu.name IN ('#joaoamoedo', '#joaoamoedo2018', '#amoedo2018', '#joaoamoedopresidente', '#amoedopresidente', '#JoaoAmoedoNaJovemPan')
+	WHERE tw.precandidato_id = 6
 ) AS JOAO_AMOEDO
 
 FROM DUAL;

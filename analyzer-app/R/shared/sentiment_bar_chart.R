@@ -8,11 +8,11 @@ calcPercentage <- function(qtd, total){
   return(qtd / total * 100)
 }
 
-renderSentimentBarChart <- function(hashtags, nome_candidato){
-  sentiment <- getSentiment(hashtags)
+renderSentimentBarChart <- function(pre_candidato_id, nome_candidato){
+  sentiment <- getSentiment(pre_candidato_id)
 
-  ruim <- with(sentiment, c(sum(sentiment$score <= -0.25 )))
-  neutro <- with(sentiment, c(sum(sentiment$score <= 0.25 & sentiment$score > -0.25)))
+  ruim <- with(sentiment, c(sum(sentiment$score < -0.25 )))
+  neutro <- with(sentiment, c(sum(sentiment$score <= 0.25 & sentiment$score >= -0.25)))
   bom <- with(sentiment, c(sum(sentiment$score > 0.25 )))
 
   values <- c(ruim, neutro, bom)
@@ -28,7 +28,7 @@ renderSentimentBarChart <- function(hashtags, nome_candidato){
     type = "bar",
     marker = list(color = c(red, orange, green))
   )%>%
-  layout(title = paste('Sentimento nos Tweets Relacionados \u00e0', nome_candidato),
+  layout(title = paste('Sentimento nos tweets (', length(sentiment$score), ') relacionados \u00e0 ', nome_candidato, sep=''),
          yaxis = list(title = 'N\u00famero de Tweets'), xaxis = list(title = paste('Tweets analizados:', total)))
 
   return(p)

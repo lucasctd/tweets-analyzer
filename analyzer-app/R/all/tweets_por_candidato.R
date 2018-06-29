@@ -11,12 +11,14 @@ cores <- c("red", "orange", "blue", "yellow", "green", "gray")
 
 pre_candidatos <- c("Geraldo Alckmin", "Jair Bolsonaro", "Manuela D'\u00c1vila", "Marina Silva", "Ciro Gomes", "Jo\u00e3o Amo\u00eado")
 data <- c(result$GERALDO_ALCKMIN, result$JAIR_BOLSONARO, result$MANUELA_DAVILA, result$MARINA_SILVA, result$CIRO_GOMES, result$JOAO_AMOEDO)
-labels <- paste(round(data/sum(data)*100, 4), '%', sep = '')
+labels_pie <- paste(pre_candidatos, paste('(', data, ')', sep = ''), sep = ' ')
 
-dataFrame <- data.frame(pre_candidatos, data)
+dataFrame <- data.frame(labels_pie, data)
 
 #pie
-p <- plot_ly(dataFrame, labels = ~pre_candidatos, values = ~data, type = 'pie') %>% layout(title = 'Tweets por pr\u00e9-candidato',
+p <- plot_ly(dataFrame, labels = ~labels_pie, values = ~data, type = 'pie') %>% 
+         layout(title = paste('Tweets por pr\u00e9-candidato ', '(', sum(data), ')', sep = ''),
+         showlegend = T,
          xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 

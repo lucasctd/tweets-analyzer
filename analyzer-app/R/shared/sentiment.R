@@ -1,16 +1,8 @@
 source("shared/database.r")
 
-getSentiment <- function(hashtags){
+getSentiment <- function(pre_candidato_id){
   
-  query <- "SELECT score, magnitude FROM V_SENTIMENTOS WHERE hashtag IN ("
-  
-  query <- paste(query, "'#", hashtags[1], "'", sep = '')
-  
-  for(hashtag in hashtags[-1]){
-    query <- paste(query, ",'#", hashtag, "'", sep = '')
-  }
-  
-  query <- paste(query, ')', sep = '')
+  query <- paste("SELECT score, magnitude FROM V_SENTIMENTOS WHERE precandidato_id = ", pre_candidato_id)
   
   res <- dbSendQuery(con, query)
   

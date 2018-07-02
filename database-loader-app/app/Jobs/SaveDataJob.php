@@ -26,6 +26,7 @@ class SaveDataJob implements ShouldQueue
     public $data;
     public $precandidatoId;
     public $id;
+    public $premium;
 
     /**
      * Create a new job instance.
@@ -33,12 +34,14 @@ class SaveDataJob implements ShouldQueue
      * @param $data
      * @param $precandidatoId
      * @param $id
+     * @param $premium
      */
-    public function __construct($data, $precandidatoId, $id)
+    public function __construct($data, $precandidatoId, $id, $premium)
     {
         $this->data = $data;
         $this->precandidatoId = $precandidatoId;
         $this->id = $id;
+        $this->premium = $premium;
     }
 
     /**
@@ -65,11 +68,9 @@ class SaveDataJob implements ShouldQueue
 					}catch (ModelNotFoundException $e){
                         $tweetOwner = $this->saveOwner($user);
 					}
-                    $tweet = Tweet::make($tweetJson, $tweetOwner->id);
+                    $tweet = Tweet::make($tweetJson, $tweetOwner->id, $this->premium, $this->precandidatoId);
                     $tweet->save();
-                    if(isset($tweetJson->entities['hashtags'])){
-                        $this->saveHashtags($tweet->id, $tweetJson->entities['hashtags']);
-                    }
+                    $this->saveHashtags($tweet->id, $this->getHashtagsList($tweetJson, $this->premium));
                     $tweetsSalvos++;
                     DB::commit();
                 }catch (Exception $e){
@@ -86,10 +87,28 @@ class SaveDataJob implements ShouldQueue
             }
             event(new LoadDataStatusEvent('Dados persistidos no banco de dados! Tweets salvos: '.$tweetsSalvos.'. Tweets duplicados: '.$tweetsDuplicados.'. Tweets com erro: '.$tweetsComErro, $this->id));
         }catch (Exception $e){
-            event(new LoadDataStatusEvent('Ocorreu um erro ao persistir os dados. Favor verificar o log da aplicação para mais detalhes. '. $e->getMessage(), $this->id));
+            event(new LoadDataStatusEvent('Ocorreu um erro ao persistir os dados. Favor verificar o log da aplicação para mais detalhes. 
+                O job foi colocado na fila novamente com delay de 15 minutos (900 segundos).', $this->id));
             Log::error($e->getMessage());
             Log::error(AppException::getTraceAsString($e));
+            $this->release(900); //adicionar a fila dnv
         }
+    }
+
+    private function getHashtagsList($data, $premium){
+        if(property_exists($data, 'retweeted_status')){
+            return $this->getHashtagsList(((object) $data->retweeted_status), $premium);
+        }
+        if(property_exists($data, 'extended_tweet')){
+            $extendedTweet = ((object) $data->extended_tweet);
+            $entities = $extendedTweet->entities;
+        }else{
+            $entities = $data->entities;
+        }
+        if(isset($entities['hashtags'])){
+            return $entities['hashtags'];
+        }
+        return [];
     }
 
     private function saveHashtags(int $tweetId, array $hashTags){
@@ -120,16 +139,4 @@ class SaveDataJob implements ShouldQueue
         return $state->isNotEmpty() ? $state->first()->codigo : null;
     }
 
-    /**
-     * The job failed to process.
-     *
-     * @param Exception $e
-     * @return void
-     */
-    public function failed(Exception $e)
-    {
-        event(new LoadDataStatusEvent('Ocorreu um erro ao executar o job.', $this->id));
-        Log::error($e->getMessage());
-        Log::error($e->getTraceAsString());
-    }
 }

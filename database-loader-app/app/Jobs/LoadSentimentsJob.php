@@ -19,18 +19,36 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 use App\Exceptions\AppException;
 use Illuminate\Support\Facades\DB;
-
+use Throwable;
 class LoadSentimentsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+
+    /**
+     * The number of times the job may be attempted.
+     *
+     * @var int
+     */
+    public $tries = 1;
+
+    public $timeout = 7200;
+
+    public $tweets;
+    public $id;
+    private $tweetsAnalizados = 0;
+    private $releaseDelay = 240;
+    private $remainingAttempts;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($tweets, $id, $remainingAttempts = 3)
     {
+        $this->tweets = $tweets;
+        $this->id = $id;
+        $this->remainingAttempts = $remainingAttempts;
     }
 
     /**
@@ -41,15 +59,12 @@ class LoadSentimentsJob implements ShouldQueue
     public function handle()
     {
         $languageClient = new LanguageClient([
-            'keyFilePath' => '/home/vagrant/Code/tweets-analyzer.wazzu/Google_API_Project.json'
+            'keyFilePath' => '/home/vagrant/Code/google_cloud_api/Google_API_Project.json'
         ]);
         $options =  ['language' => 'pt'];
-        $tweets = $this->getTweets();
-        $totalTweetsRecebidos = count($tweets);
-        event(new LoadSentimentsStatusEvent($totalTweetsRecebidos.' tweets foram encontrados e estão sendo análisados.'));
-        $tweetsAnalizados = 0;
+        event(new LoadSentimentsStatusEvent(count($this->tweets) .' tweets foram recebidos e estão sendo análisados.', $this->id));
         try{
-            foreach ($tweets as $tweet) {
+            foreach ($this->tweets as $tweet) {
                 DB::beginTransaction();
                 $sentimentResult = $languageClient->analyzeSentiment($tweet->text, $options);
                 $entityResult = $languageClient->analyzeEntities($tweet->text, $options);
@@ -61,41 +76,51 @@ class LoadSentimentsJob implements ShouldQueue
                 $this->saveEntities($entityResult->info()['entities'], $sentiment);
                 $tweet->sentiment_id = $sentiment->id;
                 $tweet->save();
-                event(new LoadSentimentsStatusEvent('Tweet de id #'. $tweet->id .' foi analisado e atualizado! Total analizado até o momento: '.$tweetsAnalizados));
-                $tweetsAnalizados+=1;
+                event(new LoadSentimentsStatusEvent('Tweet de id #'. $tweet->id .' foi analisado e atualizado!', $this->id));
+                $this->tweetsAnalizados+=1;
                 DB::commit();
             }
-            event(new LoadSentimentsStatusEvent($tweetsAnalizados.' tweets foram análisados com sucessos!'));
-        }catch(Exception $e){
+            event(new LoadSentimentsStatusEvent($this->tweetsAnalizados.' tweets foram análisados com sucessos!', $this->id));
+        } catch(Throwable $e){
             DB::rollBack();
-            event(new LoadSentimentsStatusEvent('Ocorreu um erro ao analisar os sentimentos, somente '. $tweetsAnalizados .
-                ' tweet(s) foram analisados. Verifique o log para detalhes.'));
-            Log::error($e->getMessage());
-            Log::error(AppException::getTraceAsString($e));
+            $this->treatException($e);
         }
     }
 
-    public function getTweets(): Collection {
-        return Tweet::doesntHave('sentiment')->take(1000)->get();
+    private function treatException(Throwable $e){
+        Log::error($e->getMessage());
+        Log::error(AppException::getTraceAsString($e));
+
+        if($this->remainingAttempts > 0){
+            event(new LoadSentimentsStatusEvent('Ocorreu um erro ao analisar os sentimentos, somente '. $this->tweetsAnalizados .
+            ' tweet(s) foram analisados. O job foi posto na fila novamente onde '
+            . (count($this->tweets) - $this->tweetsAnalizados) . ' tweet(s) restante(s) serão analisados em: {'. $this->releaseDelay .'} segundos', $this->id));
+            $this->tweets = $this->tweets->slice($this->tweetsAnalizados);
+            LoadSentimentsJob::dispatch($this->tweets, $this->id, --$this->remainingAttempts)->delay(now()->addSeconds($this->releaseDelay));
+        } else {
+            event(new LoadSentimentsStatusEvent('O Job falhou pelo máximo número de vezes permitido! Nenhuma nova tentativa será feita.', $this->id));
+        }
+        $this->fail($e);
     }
 
-    public function saveSentiment($score, $magnitude, $tweetId): Sentiment{
+    private function saveSentiment($score, $magnitude, $tweetId): Sentiment{
         $sentiment = Sentiment::make($score, $magnitude, $tweetId);
         $sentiment->save();
         return $sentiment;
     }
 
-    public function saveSentences(array $sentences, Sentiment $sentiment){
+    private function saveSentences(array $sentences, Sentiment $sentiment){
         foreach ($sentences as $sentenceItem) {
             $sentence = Sentence::make($sentenceItem['text']['content'], $sentenceItem['sentiment']['score'], $sentenceItem['sentiment']['magnitude'], $sentiment->id);
             $sentence->save();
         }
     }
 
-    public function saveEntities(array $entities, Sentiment $sentiment){
+    private function saveEntities(array $entities, Sentiment $sentiment){
         foreach ($entities as $entityItem) {
             $entity = Entity::make($entityItem['name'], $entityItem['type'], $entityItem['metadata'], $entityItem['salience'], $sentiment->id);
             $entity->save();
         }
     }
+
 }

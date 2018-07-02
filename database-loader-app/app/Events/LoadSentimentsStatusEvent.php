@@ -16,15 +16,17 @@ class LoadSentimentsStatusEvent implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $status;
+    public $id;
 
     /**
      * Create a new event instance.
      *
      * @param $status
      */
-    public function __construct($status)
+    public function __construct($status, $id)
     {
         $this->status = $status .' ('.Carbon::now('America/Bahia').')';
+        $this->id = $id;
     }
 
     /**
@@ -44,6 +46,6 @@ class LoadSentimentsStatusEvent implements ShouldBroadcast
      */
     public function broadcastAs()
     {
-        return 'sentiments';
+        return 'sentiments'.$this->id;
     }
 }

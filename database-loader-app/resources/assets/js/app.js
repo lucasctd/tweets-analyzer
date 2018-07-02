@@ -19,6 +19,7 @@ window.Vue = require('vue');
 const tweetsLoaderChannel = Echo.channel('tweets-loader');
 const usersDataLoaderChannel = Echo.channel('user-data-loader');
 const sentimentsLoaderChannel = Echo.channel('sentiments-loader');
+const ownersLocationChannel = Echo.channel('owners-location');
 
 Vue.component('load-database', {
     data: function () {
@@ -27,7 +28,7 @@ Vue.component('load-database', {
             count: 1000,
             fromDate:'20180520',
             toDate: '20180611',
-            show: true,
+            show: true
         }
     },
     props: ['premium', 'precandidato'],
@@ -39,7 +40,7 @@ Vue.component('load-database', {
                 query: this.query,
                 count: this.count,
                 fromDate: (this.fromDate + '0000').replace('-', '').replace('-', ''),
-                toDate: (this.toDate + '0000').replace('-', '').replace('-', ''),
+                toDate: this.premium === '1' ? (this.toDate + '0000').replace('-', '').replace('-', '') : this.toDate,
                 precandidato: this.precandidato.id,
                 XDEBUG_SESSION_START: 'vscode',
             }).then(function (response) {
@@ -61,8 +62,11 @@ Vue.component('load-database', {
                     <label style="width: 250px; display: inline-block;">Pré-Candidato: {{precandidato.nome}}</label>
                     <label>Count:</label> <input style="margin: 10px" v-model="count" type="number"/>
                     <span v-if="premium === '1'">
-                        <label>From Date:</label> <input type="date" style="margin: 10px" v-model="fromDate" pattern="[0-9]{4}[0-9]{2}[0-9]{2}"/>
-                        <label>To Date:</label> <input type="date" style="margin: 10px" v-model="toDate" pattern="[0-9]{4}[0-9]{2}[0-9]{2}"/>
+                        <label>From Date:</label> <input type="date" style="margin: 10px" v-model="fromDate"/>
+                        <label>To Date:</label> <input type="date" style="margin: 10px" v-model="toDate"/>
+                    </span>
+                    <span v-if="premium === '0'">
+                        <label>Until:</label> <input type="date" style="margin: 10px" v-model="toDate"/>
                     </span>
                     <button style="margin: 10px" @click="load()">Load on Database</button> 
                     <button style="margin: 10px" @click="remove()">X</button> <br />Status: {{status}}
@@ -75,9 +79,16 @@ const app = new Vue({
     data:{
         precandidatos: [],
         statusUsersLoader: 'Aguardando ação do usuário.',
-        loadSentimentsStatus: 'Aguardando ação do usuário.',
+        loadSentimentsStatus: {
+           info: 'Aguardando ação do usuário.',
+           jobs: []
+
+        },
+        ownersLocationStatus: 'Aguardando ação do usuário.',
         showBasicSearch: false,
-        showPremiumSearch: false
+        showPremiumSearch: false,
+        take: null,
+        chunk: null,
     },
     mounted(){
         let that = this;
@@ -91,8 +102,8 @@ const app = new Vue({
             let that = this;
             axios.post('http://tweets-analyzer.wazzu/load-users-data')
                 .then(function (response) {
-                    that.statusUsersLoader = response.data.message;
                     let event = '.load-user-data-status';
+                    that.statusUsersLoader = response.data.message;
                     usersDataLoaderChannel.listen(event, (e) => {
                         that.statusUsersLoader = e.status;
                     });
@@ -103,16 +114,50 @@ const app = new Vue({
         },
        loadSentiments(){
             let that = this;
-            axios.post('http://tweets-analyzer.wazzu/analyze-sentiment')
+            const failedPatt = /\{[0-9]+\}/;
+            axios.post('http://tweets-analyzer.wazzu/analyze-sentiment', {chunk: this.chunk, take: this.take})
                 .then(function (response) {
-                    that.loadSentimentsStatus = response.data.message;
                     let event = '.sentiments';
-                    sentimentsLoaderChannel.listen(event, (e) => {
-                        that.loadSentimentsStatus = e.status;
+                    that.loadSentimentsStatus.jobs = response.data.jobs;
+                    that.loadSentimentsStatus.jobs.forEach(job => {
+                        sentimentsLoaderChannel.listen(event + job.id.toString(), (e) => {
+                            job.count++;
+                            if(failedPatt.test(e.status)){
+                                let remaining = failedPatt.exec(e.status)[0].replace(/(\{|\})/g, '');
+                                job.status += (job.count + '- ' + e.status + '<br />');
+                                const interval = setInterval(() => {
+                                    remaining--;
+                                    if(remaining == 0){
+                                        job.status = job.status.replace(failedPatt, remaining);
+                                        clearInterval(interval);
+                                    }else{
+                                        job.status = job.status.replace(failedPatt, '{'.concat(remaining).concat('}'));
+                                    }
+                                }, 1000);
+                            }else{
+                                job.status += (job.count + '- ' + e.status + '<br />');
+                            }
+                        });
                     });
                 })
                 .catch(function (response) {
                     this.loadSentimentsStatus = response.data.error;
+                });
+        },
+        updateOwnersLocation(){
+            let that = this;
+            let count = 0;
+            axios.post('http://tweets-analyzer.wazzu/update-owners-location')
+                .then(function (response) {
+                    let event = '.update-owners-location-status';
+                    that.ownersLocationStatus = '';
+                    ownersLocationChannel.listen(event, (e) => {
+                        count++;
+                        that.ownersLocationStatus += (count.toString()  + '-' + e.status + '<br />');
+                    });
+                })
+                .catch(function (response) {
+                    this.ownersLocationStatus = response.data.error;
                 });
         }
     }

@@ -28,4 +28,8 @@ class PreCandidato extends Model
     public function hashtags(){
         return $this->hasMany('App\Models\Hashtag', 'precandidato_id', 'id');
     }
+
+    public function tweets(){
+        return $this->hasMany('App\Models\Tweet', 'precandidato_id', 'id');
+    }
 }

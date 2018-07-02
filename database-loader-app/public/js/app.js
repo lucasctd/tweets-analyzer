@@ -13895,6 +13895,7 @@ window.Vue = __webpack_require__(38);
 var tweetsLoaderChannel = Echo.channel('tweets-loader');
 var usersDataLoaderChannel = Echo.channel('user-data-loader');
 var sentimentsLoaderChannel = Echo.channel('sentiments-loader');
+var ownersLocationChannel = Echo.channel('owners-location');
 
 Vue.component('load-database', {
     data: function data() {
@@ -13915,7 +13916,7 @@ Vue.component('load-database', {
                 query: this.query,
                 count: this.count,
                 fromDate: (this.fromDate + '0000').replace('-', '').replace('-', ''),
-                toDate: (this.toDate + '0000').replace('-', '').replace('-', ''),
+                toDate: this.premium === '1' ? (this.toDate + '0000').replace('-', '').replace('-', '') : this.toDate,
                 precandidato: this.precandidato.id,
                 XDEBUG_SESSION_START: 'vscode'
             }).then(function (response) {
@@ -13932,7 +13933,7 @@ Vue.component('load-database', {
             this.show = false;
         }
     },
-    template: '<div v-if="show">\n                    <label style="width: 250px; display: inline-block;">Pr\xE9-Candidato: {{precandidato.nome}}</label>\n                    <label>Count:</label> <input style="margin: 10px" v-model="count" type="number"/>\n                    <span v-if="premium === \'1\'">\n                        <label>From Date:</label> <input type="date" style="margin: 10px" v-model="fromDate" pattern="[0-9]{4}[0-9]{2}[0-9]{2}"/>\n                        <label>To Date:</label> <input type="date" style="margin: 10px" v-model="toDate" pattern="[0-9]{4}[0-9]{2}[0-9]{2}"/>\n                    </span>\n                    <button style="margin: 10px" @click="load()">Load on Database</button> \n                    <button style="margin: 10px" @click="remove()">X</button> <br />Status: {{status}}\n                    <div style="width:100%; height:1px; background-color: black; margin-top: 15px; margin-bottom: 10px;"> </div>\n               </div>'
+    template: '<div v-if="show">\n                    <label style="width: 250px; display: inline-block;">Pr\xE9-Candidato: {{precandidato.nome}}</label>\n                    <label>Count:</label> <input style="margin: 10px" v-model="count" type="number"/>\n                    <span v-if="premium === \'1\'">\n                        <label>From Date:</label> <input type="date" style="margin: 10px" v-model="fromDate"/>\n                        <label>To Date:</label> <input type="date" style="margin: 10px" v-model="toDate"/>\n                    </span>\n                    <span v-if="premium === \'0\'">\n                        <label>Until:</label> <input type="date" style="margin: 10px" v-model="toDate"/>\n                    </span>\n                    <button style="margin: 10px" @click="load()">Load on Database</button> \n                    <button style="margin: 10px" @click="remove()">X</button> <br />Status: {{status}}\n                    <div style="width:100%; height:1px; background-color: black; margin-top: 15px; margin-bottom: 10px;"> </div>\n               </div>'
 });
 
 var app = new Vue({
@@ -13940,9 +13941,16 @@ var app = new Vue({
     data: {
         precandidatos: [],
         statusUsersLoader: 'Aguardando ação do usuário.',
-        loadSentimentsStatus: 'Aguardando ação do usuário.',
+        loadSentimentsStatus: {
+            info: 'Aguardando ação do usuário.',
+            jobs: []
+
+        },
+        ownersLocationStatus: 'Aguardando ação do usuário.',
         showBasicSearch: false,
-        showPremiumSearch: false
+        showPremiumSearch: false,
+        take: null,
+        chunk: null
     },
     mounted: function mounted() {
         var that = this;
@@ -13955,8 +13963,8 @@ var app = new Vue({
         loadUsersData: function loadUsersData() {
             var that = this;
             axios.post('http://tweets-analyzer.wazzu/load-users-data').then(function (response) {
-                that.statusUsersLoader = response.data.message;
                 var event = '.load-user-data-status';
+                that.statusUsersLoader = response.data.message;
                 usersDataLoaderChannel.listen(event, function (e) {
                     that.statusUsersLoader = e.status;
                 });
@@ -13966,14 +13974,46 @@ var app = new Vue({
         },
         loadSentiments: function loadSentiments() {
             var that = this;
-            axios.post('http://tweets-analyzer.wazzu/analyze-sentiment').then(function (response) {
-                that.loadSentimentsStatus = response.data.message;
+            var failedPatt = /\{[0-9]+\}/;
+            axios.post('http://tweets-analyzer.wazzu/analyze-sentiment', { chunk: this.chunk, take: this.take }).then(function (response) {
                 var event = '.sentiments';
-                sentimentsLoaderChannel.listen(event, function (e) {
-                    that.loadSentimentsStatus = e.status;
+                that.loadSentimentsStatus.jobs = response.data.jobs;
+                that.loadSentimentsStatus.jobs.forEach(function (job) {
+                    sentimentsLoaderChannel.listen(event + job.id.toString(), function (e) {
+                        job.count++;
+                        if (failedPatt.test(e.status)) {
+                            var remaining = failedPatt.exec(e.status)[0].replace(/(\{|\})/g, '');
+                            job.status += job.count + '- ' + e.status + '<br />';
+                            var interval = setInterval(function () {
+                                remaining--;
+                                if (remaining == 0) {
+                                    job.status = job.status.replace(failedPatt, remaining);
+                                    clearInterval(interval);
+                                } else {
+                                    job.status = job.status.replace(failedPatt, '{'.concat(remaining).concat('}'));
+                                }
+                            }, 1000);
+                        } else {
+                            job.status += job.count + '- ' + e.status + '<br />';
+                        }
+                    });
                 });
             }).catch(function (response) {
                 this.loadSentimentsStatus = response.data.error;
+            });
+        },
+        updateOwnersLocation: function updateOwnersLocation() {
+            var that = this;
+            var count = 0;
+            axios.post('http://tweets-analyzer.wazzu/update-owners-location').then(function (response) {
+                var event = '.update-owners-location-status';
+                that.ownersLocationStatus = '';
+                ownersLocationChannel.listen(event, function (e) {
+                    count++;
+                    that.ownersLocationStatus += count.toString() + '-' + e.status + '<br />';
+                });
+            }).catch(function (response) {
+                this.ownersLocationStatus = response.data.error;
             });
         }
     }

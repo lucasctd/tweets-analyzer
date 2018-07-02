@@ -14,8 +14,23 @@
                     Tweets Loader
                 </h2>
                 <span>
+                    <button @click="updateOwnersLocation">Atualizar Localização de usuários</button>
+                    <div>Log: </div>
+                    <div style="margin-top:10px; max-height: 200px; width: 100%; overflow: auto;">
+                        <span v-html="ownersLocationStatus"></span>
+                    </div>
+                </span>
+                <br /><br />
+                <span>
+                    <label>Take:</label> <input style="margin: 10px" v-model="take" type="number"/>
+                    <label>Chunk:</label> <input style="margin: 10px" v-model="chunk" type="number"/>
                     <button @click="loadSentiments">Analisar Sentimentos</button>
-                    <span>Status: @{{loadSentimentsStatus}}</span>
+
+                    <div>Log: </div>
+                    <div style="margin-top:10px; max-height: 200px; width: 100%; overflow: auto;" v-for="job in loadSentimentsStatus.jobs" :key="job.id">
+                        <h3>Job: #@{{job.id}}</h3>
+                        <span v-html="job.status"></span>
+                    </div>
                 </span>
                 <br /><br />
                 <button @click="showPremiumSearch = !showPremiumSearch">@{{!showPremiumSearch ? 'Show' : 'Hide'}} Premium Search</button>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<ruleset name="AppStandard" namespace="App\CS\Standard">
+
+    <description>Customização criada apenas para excluir algumas regras</description>
+    <exclude-pattern type="relative">*/vendor/*</exclude-pattern>
+    <exclude-pattern type="relative">*/database/*</exclude-pattern>
+    <rule ref="PSR1"/>
+    <rule ref="PSR2"/>
+    <rule ref="PEAR">
+        <exclude name="PEAR.Commenting.FileComment.Missing"/>
+    </rule>
+</ruleset>

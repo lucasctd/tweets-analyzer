@@ -5,7 +5,7 @@ namespace App\Events;
 use Illuminate\Broadcasting\Channel;
 
 /**
- * Classe resposável pelos eventos relacionados ao carregamento de sentimentos
+ * Classe resposável pelos eventos relacionados ao carregamento de tweets
  *
  * @category Event
  * @package  App\Events
@@ -13,8 +13,9 @@ use Illuminate\Broadcasting\Channel;
  * @license  https://github.com/lucasctd/tweets-analyzer/blob/master/LICENSE - LICENSE
  * @link     https://github.com/lucasctd/tweets-analyzer
  */
-class LoadSentimentsStatusEvent extends Event
+class LoadTweetsStatusEvent extends Event
 {
+
     /**
      * Get the channels the event should broadcast on.
      *
@@ -22,7 +23,7 @@ class LoadSentimentsStatusEvent extends Event
      */
     public function broadcastOn()
     {
-        return new Channel('sentiment-channel');
+        return new Channel('tweet-channel');
     }
 
     /**
@@ -32,6 +33,6 @@ class LoadSentimentsStatusEvent extends Event
      */
     public function broadcastAs()
     {
-        return 'load-sentiments-status-'.$this->id;
+        return 'load-tweet-status-'.$this->id;
     }
 }

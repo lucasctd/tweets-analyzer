@@ -3,29 +3,18 @@
 namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Carbon\Carbon;
 
-class UpdateOwnersLocationStatusEvent implements ShouldBroadcast
+/**
+ * Classe resposável pelos eventos relacionados a atualização da localização dos usuários do twitter
+ *
+ * @category Event
+ * @package  App\Events
+ * @author   Lucas Reis <lucas@programmer.com.br>
+ * @license  https://github.com/lucasctd/tweets-analyzer/blob/master/LICENSE - LICENSE
+ * @link     https://github.com/lucasctd/tweets-analyzer
+ */
+class UpdateOwnersLocationStatusEvent extends Event
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
-
-    public $status;
-
-    /**
-     * Create a new event instance.
-     *
-     * @param $status
-     */
-    public function __construct($status)
-    {
-        $this->status = $status .' ('.Carbon::now('America/Bahia').')';
-    }
 
     /**
      * Get the channels the event should broadcast on.
@@ -34,7 +23,7 @@ class UpdateOwnersLocationStatusEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('owners-location');
+        return new Channel('location-channel');
     }
 
     /**

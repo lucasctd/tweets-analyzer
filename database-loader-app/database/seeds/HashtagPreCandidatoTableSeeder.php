@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 
-class HashtagTableSeeder extends Seeder
+class HashtagPreCandidatoTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -36,7 +36,7 @@ class HashtagTableSeeder extends Seeder
             foreach ($hastags as $hastag){
                 DB::table('hashtag')->insert([
                     'name' => '#'.$hastag,
-                    'precandidato_id' => $precandidato,
+                    'filter_id' => $precandidato,
                     'primary' => true,
                 ]);
             }

@@ -7,8 +7,6 @@
 
 require('./bootstrap');
 
-window.Vue = require('vue');
-
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -35,7 +33,7 @@ Vue.component('load-database', {
     methods: {
         load(){
             let that = this;
-            axios.post('http://tweets-analyzer.wazzu/load-data', {
+            axios.post('http://tweets-analyzer.wazzu/load-tweets', {
                 premium: this.premium,
                 query: this.query,
                 count: this.count,

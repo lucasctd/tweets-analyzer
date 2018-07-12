@@ -11,12 +11,12 @@
     },
     "devDependencies": {
         "axios": "^0.18",
-        "bootstrap": "^4.0.0",
+        "browser-sync": "^2.24.5",
+        "browser-sync-webpack-plugin": "2.0.1",
         "cross-env": "^5.1",
-        "jquery": "^3.2",
+        "jslint": "^0.12.0",
         "laravel-mix": "^2.0",
-        "lodash": "^4.17.4",
-        "popper.js": "^1.12",
+        "moment": "^2.22.2",
         "vue": "^2.5.7"
     },
     "dependencies": {

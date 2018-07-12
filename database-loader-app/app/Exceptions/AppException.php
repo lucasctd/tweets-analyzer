@@ -1,18 +1,28 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: lucas
- * Date: 06/05/2018
- * Time: 22:51
- */
-
 namespace App\Exceptions;
 
 use Exception;
 
+/**
+ * Classe de customização das exceções da aplicação
+ *
+ * @category Exception
+ * @package  App\Exceptions
+ * @author   Lucas Reis <lucas@programmer.com.br>
+ * @license  https://github.com/lucasctd/tweets-analyzer/blob/master/LICENSE - LICENSE
+ * @link     https://github.com/lucasctd/tweets-analyzer
+ */
 class AppException
 {
-    public static function getTraceAsString(Exception $exception) {
+    /**
+     * Escreve toda a exceção no log da aplicação
+     *
+     * @param Exception $exception - Exceção capturada
+     *
+     * @return void
+     */
+    public static function getTraceAsString(Exception $exception)
+    {
         $rtn = "";
         $count = 0;
         foreach ($exception->getTrace() as $frame) {
@@ -39,21 +49,21 @@ class AppException
                 $args = join(", ", $args);
             }
             $current_file = "[internal function]";
-            if(isset($frame['file']))
-            {
+            if (isset($frame['file'])) {
                 $current_file = $frame['file'];
             }
             $current_line = "";
-            if(isset($frame['line']))
-            {
+            if (isset($frame['line'])) {
                 $current_line = $frame['line'];
             }
-            $rtn .= sprintf( "#%s %s(%s): %s(%s)\n",
+            $rtn .= sprintf(
+                "#%s %s(%s): %s(%s)\n",
                 $count,
                 $current_file,
                 $current_line,
                 $frame['function'],
-                $args );
+                $args
+            );
             $count++;
         }
         return $rtn;

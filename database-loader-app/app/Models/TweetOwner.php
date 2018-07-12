@@ -2,13 +2,22 @@
 
 namespace App\Models;
 
-use App\Traits\ModelHelper;
+use App\Traits\ModelTrait;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 
+/**
+ * Classe resposável pelo mapeamento da tabela tweet_owner
+ *
+ * @category Model
+ * @package  App\Models
+ * @author   Lucas Reis <lucas@programmer.com.br>
+ * @license  https://github.com/lucasctd/tweets-analyzer/blob/master/LICENSE - LICENSE
+ * @link     https://github.com/lucasctd/tweets-analyzer
+ */
 class TweetOwner extends Model
 {
-    use ModelHelper;
+    use ModelTrait;
 
     public $table = 'tweet_owner';
     public $timestamps = false;
@@ -19,13 +28,22 @@ class TweetOwner extends Model
         'user_created_at', 'created_at', 'city_id', 'br_state_id'
     ];
 
+    /**
+     * Cria uma instância de TweetOwner
+     *
+     * @param object $data    - objeto do dono do tweet
+     * @param int    $cityId  - Id da cidade
+     * @param string $stateId - Id do estado
+     *
+     * @return TweetOwner
+     */
     public static function make(object $data, int $cityId = null, int $stateId = null) : TweetOwner
     {
         $tweetOwner = new TweetOwner(
             [
                 'id' => $data->id,
                 'id_str' => $data->id_str,
-				'name' => $data->name,
+                'name' => $data->name,
                 'screen_name' => $data->screen_name,
                 'location' => $data->location,
                 'url' => $data->url,
@@ -44,6 +62,11 @@ class TweetOwner extends Model
         return $tweetOwner;
     }
 
+    /**
+     * Retorna lista dos tweets vinculados a esta conta do Twitter
+     *
+     * @return Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function tweets()
     {
         return $this->hasMany('App\Models\Tweet', 'owner_id', 'id');

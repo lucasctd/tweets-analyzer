@@ -6,7 +6,4 @@
     <exclude-pattern type="relative">*/database/*</exclude-pattern>
     <rule ref="PSR1"/>
     <rule ref="PSR2"/>
-    <rule ref="PEAR">
-        <exclude name="PEAR.Commenting.FileComment.Missing"/>
-    </rule>
 </ruleset>

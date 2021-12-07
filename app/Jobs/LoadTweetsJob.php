@@ -2,6 +2,8 @@
 namespace App\Jobs;
 
 use App\Events\LoadTweetsStatusEvent;
+use App\Interfaces\FilterInterface;
+use App\Interfaces\JobInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Bus\Queueable;
@@ -10,9 +12,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Http\Request;
-use App\Interfaces\FilterInterface;
-use App\Interfaces\JobInterface;
 
 /**
  * Classe resposável pela busca dos Tweets

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Interfaces\FilterInterface;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Classe responsável pelo mapeamento da tabela city

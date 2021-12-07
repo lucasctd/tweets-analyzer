@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Jobs\LoadSentimentsJob;
 use App\Models\Tweet;
+use Illuminate\Http\Request;
 
 /**
  * Classe resposável por receber as requisições relacionadas aos sentimentos

@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use App\Interfaces\FilterInterface;
 use App\Traits\ModelTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use App\Interfaces\FilterInterface;
 
 /**
  * Classe resposável pelo mapeamento da tabela tweet

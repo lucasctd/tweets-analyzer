@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Traits\ModelTrait;
-use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Classe resposável pelo mapeamento da tabela tweet_owner

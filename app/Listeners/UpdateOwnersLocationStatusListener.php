@@ -3,8 +3,6 @@
 namespace App\Listeners;
 
 use App\Events\UpdateOwnersLocationStatusEvent;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class UpdateOwnersLocationStatusListener
 {

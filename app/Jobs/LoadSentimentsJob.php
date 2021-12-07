@@ -2,25 +2,22 @@
 
 namespace App\Jobs;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Http\Request;
-use App\Models\Sentiment;
-use App\Models\Sentence;
-use App\Models\Entity;
-use App\Models\Tweet;
 use App\Events\LoadSentimentsStatusEvent;
-use Google\Cloud\Language\LanguageClient;
-use Exception;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Log;
 use App\Exceptions\AppException;
-use Illuminate\Support\Facades\DB;
-use Throwable;
 use App\Interfaces\JobInterface;
+use App\Models\Entity;
+use App\Models\Sentence;
+use App\Models\Sentiment;
+use Google\Cloud\Language\LanguageClient;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * Classe resposável carregar e salvar os tweets

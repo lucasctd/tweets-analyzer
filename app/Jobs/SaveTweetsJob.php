@@ -12,23 +12,21 @@
 namespace App\Jobs;
 
 use App\Events\LoadTweetsStatusEvent;
-use App\Models\Hashtag;
-use Illuminate\Bus\Queueable;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use App\Models\City;
-use App\Models\State;
-use App\Models\TweetOwner;
-use App\Models\Tweet;
-use Illuminate\Support\Facades\Log;
-use Exception;
-use Illuminate\Support\Facades\DB;
 use App\Exceptions\AppException;
-use App\Traits\LocationTrait;
 use App\Interfaces\JobInterface;
+use App\Models\Hashtag;
+use App\Models\Tweet;
+use App\Models\TweetOwner;
+use App\Traits\LocationTrait;
+use Exception;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Classe resposável por persistir os tweets

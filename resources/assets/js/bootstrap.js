@@ -9,6 +9,7 @@ window.axios = require('axios');
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 import moment from 'moment';
+import Echo from 'laravel-echo'
 
 window.moment = moment;
 
@@ -33,8 +34,6 @@ if (token) {
  */
 
 window.Vue = require('vue');
-
-import Echo from 'laravel-echo'
 
 window.Pusher = require('pusher-js');
 

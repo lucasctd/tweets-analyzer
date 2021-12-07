@@ -2,10 +2,11 @@
 // phpcs:ignore
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Schema;
 use App\Interfaces\FilterInterface;
 use App\Models\PreCandidato;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\ServiceProvider;
+
 // phpcs:ignore
 class AppServiceProvider extends ServiceProvider
 {

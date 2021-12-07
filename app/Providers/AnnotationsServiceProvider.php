@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Event;
 use Collective\Annotations\AnnotationsServiceProvider as ServiceProvider;
 
 class AnnotationsServiceProvider extends ServiceProvider 

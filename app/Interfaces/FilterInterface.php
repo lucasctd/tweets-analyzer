@@ -1,7 +1,7 @@
 <?php
 namespace App\Interfaces;
 
-use \Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Interface obrigatória nos models de filtro da aplicação

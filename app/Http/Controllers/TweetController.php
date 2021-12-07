@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Jobs\LoadTweetsJob;
+use Illuminate\Http\Request;
 
 /**
  * Classe resposável por receber as requisições relacionadas aos sentimentos

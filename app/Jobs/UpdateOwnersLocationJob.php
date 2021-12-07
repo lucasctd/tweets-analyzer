@@ -2,20 +2,18 @@
 
 namespace App\Jobs;
 
+use App\Events\UpdateOwnersLocationStatusEvent;
+use App\Exceptions\AppException;
+use App\Interfaces\JobInterface;
+use App\Models\TweetOwner;
+use App\Traits\LocationTrait;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use App\Models\TweetOwner;
-use App\Events\UpdateOwnersLocationStatusEvent;
-use App\Models\State;
-use App\Models\City;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Exceptions\AppException;
-use App\Traits\LocationTrait;
-use App\Interfaces\JobInterface;
 
 /**
  * Classe resposável pela busca dos Tweets

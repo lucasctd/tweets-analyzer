@@ -1,15 +1,8 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Jobs\LoadUsersDataJob;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Mockery\Exception;
-use App\Jobs\LoadSentimentsJob;
-use App\Models\PreCandidato;
-use App\Jobs\UpdateOwnersLocationJob;
-use App\Models\Tweet;
-use App\Interfaces\FilterInterface;
+use Collective\Annotations\Routing\Annotations\Annotations\Get;
+use Illuminate\Contracts\View\View;
 
 /**
  * Classe resposável por receber as requisições da aplicação
@@ -27,9 +20,9 @@ class AppController extends Controller
      *
      * @Get("/")
      *
-     * @return Illuminate\View\View
+     * @return View
      */
-    public function index()
+    public function index(): View
     {
         return view('home');
     }

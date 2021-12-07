@@ -1,8 +1,6 @@
 <?php
 namespace App\Interfaces;
 
-use \Illuminate\Database\Eloquent\Relations\HasMany;
-
 /**
  * Interface obrigatória nos jobs da aplicação
  *

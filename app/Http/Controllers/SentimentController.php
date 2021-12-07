@@ -4,7 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Jobs\LoadSentimentsJob;
 use App\Models\Tweet;
+use Collective\Annotations\Routing\Annotations\Annotations\Get;
+use Collective\Annotations\Routing\Annotations\Annotations\Post;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
+use Throwable;
 
 /**
  * Classe resposável por receber as requisições relacionadas aos sentimentos
@@ -26,24 +31,24 @@ class SentimentController extends Controller
      *
      * @Post("/analyze")
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function analyzeSentiments(Request $request)
+    public function analyzeSentiments(Request $request): JsonResponse
     {
         try {
             $count = 0;
             $tweets = Tweet::doesntHave('sentiment')->take($request->take)->get();
             $chunks = $tweets->chunk($request->chunk);
             foreach ($chunks as $chunk) {
-                LoadSentimentsJob::dispatch($chunk, $count + 1)->delay(now()->addMinutes($count * 1));
+                LoadSentimentsJob::dispatch($chunk, $count + 1)->delay(now()->addMinutes($count));
                 $count++;
             }
             $jobs = [];
             for ($i = 1; $i <= $count; $i++) {
                 $jobs[] = ['id' => $i, 'status' => 'Your request is being processed.', 'percent' => 0];
             }
-            return response()->json(['message' => 'Your request is being processed.', 'jobs' => $jobs], 200);
-        } catch (Exception $e) {
+            return response()->json(['message' => 'Your request is being processed.', 'jobs' => $jobs]);
+        } catch (Throwable) {
             return response()->json(['error' => 'Something got wrong loading the tweets from the database. Please check the log files.'], 401);
         }
     }
@@ -54,9 +59,9 @@ class SentimentController extends Controller
      * @Get("/load")
      *
      * @link   https://cloud.google.com/natural-language/docs/quickstart-client-libraries
-     * @return \Illuminate\View\View
+     * @return View
      */
-    public function showStandartPage()
+    public function showStandartPage(): View
     {
         return view('sentiment.load');
     }

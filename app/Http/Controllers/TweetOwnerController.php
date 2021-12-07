@@ -3,6 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\UpdateOwnersLocationJob;
+use Collective\Annotations\Routing\Annotations\Annotations\Get;
+use Collective\Annotations\Routing\Annotations\Annotations\Post;
+use Illuminate\Http\JsonResponse;
+use Illuminate\View\View;
+use Throwable;
 
 /**
  * Classe resposável por receber as requisições relacionadas aos donos de tweets
@@ -22,14 +27,14 @@ class TweetOwnerController extends Controller
      *
      * @Post("/update-location")
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function updateOwnersLocation()
+    public function updateOwnersLocation(): JsonResponse
     {
         try {
             UpdateOwnersLocationJob::dispatch();
             return response()->json(['message' => 'Your request is being processed.'], 200);
-        } catch (Exception $e) {
+        } catch (Throwable) {
             return response()->json(['error' => 'Something got wrong loading the tweets from the database. Please check the log files.'], 401);
         }
     }
@@ -40,9 +45,9 @@ class TweetOwnerController extends Controller
      * @Get("/update-location")
      *
      * @link   https://cloud.google.com/natural-language/docs/quickstart-client-libraries
-     * @return \Illuminate\View\View
+     * @return View
      */
-    public function showUpdateLocationPage()
+    public function showUpdateLocationPage(): View
     {
         return view('tweet-owner.update-location');
     }

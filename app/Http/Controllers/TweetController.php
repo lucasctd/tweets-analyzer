@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\LoadTweetsJob;
+use Collective\Annotations\Routing\Annotations\Annotations\Get;
+use Collective\Annotations\Routing\Annotations\Annotations\Post;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 /**
  * Classe resposável por receber as requisições relacionadas aos sentimentos
@@ -25,9 +29,9 @@ class TweetController extends Controller
      *
      * @Post("/premium/load")
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function loadTweetsPremium(Request $request)
+    public function loadTweetsPremium(Request $request): JsonResponse
     {
         $requestId = hexdec(uniqid());
         if ($request->has('count') && $request->has('fromDate') && $request->has('toDate') && $request->has('filterId')) {
@@ -44,9 +48,9 @@ class TweetController extends Controller
      *
      * @Post("/standart/load")
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function loadTweetsStandart(Request $request)
+    public function loadTweetsStandart(Request $request): JsonResponse
     {
         $requestId = hexdec(uniqid());
         if ($request->has('count') && $request->has('until') && $request->has('filterId')) {
@@ -61,9 +65,9 @@ class TweetController extends Controller
      *
      * @Get("/premium")
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
-    public function showPremiumPage()
+    public function showPremiumPage(): View
     {
         return view('tweet.premium');
     }
@@ -73,9 +77,9 @@ class TweetController extends Controller
      *
      * @Get("/standart")
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
-    public function showStandartPage()
+    public function showStandartPage(): View
     {
         return view('tweet.standart');
     }

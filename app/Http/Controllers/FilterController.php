@@ -3,7 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Interfaces\FilterInterface;
+use Collective\Annotations\Routing\Annotations\Annotations\Get;
+use Collective\Annotations\Routing\Annotations\Annotations\Resource;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Throwable;
 
 /**
  * Classe resposável por receber as requisições relacionadas aos sentimentos
@@ -21,7 +26,7 @@ class FilterController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return void
      */
     public function index()
     {
@@ -31,7 +36,7 @@ class FilterController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return void
      */
     public function create()
     {
@@ -41,9 +46,9 @@ class FilterController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request -
+     * @param Request $request -
      *
-     * @return \Illuminate\Http\Response
+     * @return void
      */
     public function store(Request $request)
     {
@@ -55,9 +60,9 @@ class FilterController extends Controller
      *
      * @param int $id - Id do filtro
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function show($id)
+    public function show(int $id): Response
     {
         return resolve(FilterInterface::class)->find($id);
     }
@@ -67,13 +72,13 @@ class FilterController extends Controller
      *
      * @Get("/filter/all")
      *
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function showAll()
+    public function showAll(): JsonResponse
     {
         try {
             return resolve(FilterInterface::class)->all();
-        } catch (Exception $e) {
+        } catch (Throwable) {
             return response()->json(['error' => 'Something got wrong loading the tweets from the database. Please check the log files.'], 401);
         }
     }
@@ -83,9 +88,9 @@ class FilterController extends Controller
      *
      * @param int $id - Id do filtro
      *
-     * @return \Illuminate\Http\Response
+     * @return void
      */
-    public function edit($id)
+    public function edit(int $id)
     {
         //
     }
@@ -93,12 +98,12 @@ class FilterController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request -
-     * @param int                      $id      -
+     * @param Request $request
+     * @param int     $id
      *
-     * @return \Illuminate\Http\Response
+     * @return void
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id)
     {
         //
     }
@@ -106,11 +111,11 @@ class FilterController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param int $id -
+     * @param int $id
      *
-     * @return \Illuminate\Http\Response
+     * @return void
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
         //
     }

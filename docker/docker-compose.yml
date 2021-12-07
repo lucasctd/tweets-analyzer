@@ -1,0 +1,36 @@
+version: '3'
+services:
+    web-ellections-tweets-analyzer:
+        image: nginx:1.19-alpine
+        restart: on-failure
+        volumes:
+            - ../:/var/www/html
+            - ./nginx/site.conf:/etc/nginx/conf.d/default.conf
+        ports:
+            - "8060:80"
+
+    php-ellections-tweets-analyzer:
+        restart: on-failure
+        build:
+            context: php
+        volumes:
+            - ../:/var/www/html
+        environment:
+            XDEBUG_CONFIG: "remote_host=host.docker.internal"
+            PHP_IDE_CONFIG: "serverName=localhost"
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+
+    db-ellections-tweets-analyzer:
+        image: mariadb:latest
+        restart: on-failure
+        environment:
+            MARIADB_DATABASE: "ellections_tweets_analyzer"
+            MARIADB_ROOT_PASSWORD: password
+        ports:
+            - "3366:3306"
+
+networks:
+    default:
+        external:
+            name: web

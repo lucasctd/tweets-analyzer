@@ -19,9 +19,9 @@ class AppException
      *
      * @param Exception $exception - Exceção capturada
      *
-     * @return void
+     * @return string
      */
-    public static function getTraceAsString(Exception $exception)
+    public static function getTraceAsString(Exception $exception): string
     {
         $rtn = "";
         $count = 0;

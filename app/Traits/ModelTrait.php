@@ -21,7 +21,7 @@ trait ModelTrait
      *
      * @return mixed
      */
-    public static function getValue(string $property, $data)
+    public static function getValue(string $property, object $data): mixed
     {
         return property_exists($data, $property) ? $data->$property : null;
     }

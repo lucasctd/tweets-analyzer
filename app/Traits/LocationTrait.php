@@ -21,9 +21,9 @@ trait LocationTrait
      *
      * @param string $cityName - Nome da cidade
      *
-     * @return int
+     * @return int|null
      */
-    private function _getCity(string $cityName) : ?int
+    private function getCity(string $cityName) : ?int
     {
         $city = City::where('nome', $cityName)->get();
         return count($city) === 1 ? $city->first()->codigo : null;
@@ -34,9 +34,9 @@ trait LocationTrait
      *
      * @param string $stateName - Nome do Estado
      *
-     * @return int
+     * @return int|null
      */
-    private function _getState($stateName) : ?int
+    private function getState(string $stateName) : ?int
     {
         $state = State::where('nome', $stateName)->get();
         return $state->isNotEmpty() ? $state->first()->codigo : null;

@@ -16,7 +16,7 @@ class AppServiceProvider extends ServiceProvider
      *
      * @var array
      */
-    public $bindings = [
+    public array $bindings = [
         FilterInterface::class => PreCandidato::class,
     ];
 
@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
      *
      * @var array
      */
-    public $singletons = [
+    public array $singletons = [
     ];
 
     /**

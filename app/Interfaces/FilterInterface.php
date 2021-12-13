@@ -33,14 +33,14 @@ interface FilterInterface
     /**
      * Retorna o valor para o atributo (JSON) name
      *
-     * @return mixed
+     * @return string
      */
-    public function getNameAttribute();
+    public function getNameAttribute(): string;
 
     /**
      * Retorna o valor para o atributo (JSON) id
      *
-     * @return mixed
+     * @return string
      */
-    public function getIdAttribute();
+    public function getIdAttribute(): string;
 }

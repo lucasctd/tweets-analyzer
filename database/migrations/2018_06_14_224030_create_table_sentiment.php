@@ -15,8 +15,8 @@ class CreateTableSentiment extends Migration
     {
         Schema::create('sentiment', function (Blueprint $table) {
             $table->increments('id');
-            $table->decimal('score', 3, 2);
-            $table->decimal('magnitude', 12, 2);
+            $table->decimal('score', 3);
+            $table->decimal('magnitude', 12);
         });
     }
 

@@ -26,33 +26,27 @@ class LoadTweetsJob implements ShouldQueue, JobInterface
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $premium;
-    public $count;
-    public $filterId;
-    public $fromDate;
-    public $toDate;
-    public $id;
-
-    public $timeout = 300;
+    public int $timeout = 300;
 
     /**
      * Create a new job instance.
      *
-     * @param bool   $premium  - Informa se requisição vai acessar api premium do Twitter
-     * @param number $count    - Quantidade de Tweets
+     * @param bool $premium - Informa se requisição vai acessar api premium do Twitter
+     * @param int $count - Quantidade de Tweets
      * @param string $filterId - Id do filtro
-     * @param Date   $fromDate -Data inicial
-     * @param Date   $toDate   - Data final
-     * @param number $id       - Id do Job
+     * @param string $fromDate -Data inicial
+     * @param string $toDate - Data final
+     * @param int $id - Id do Job
      */
-    public function __construct($premium, $count, $filterId, $fromDate, $toDate, $id)
+    public function __construct(
+        public bool $premium,
+        public int $count,
+        public string $filterId,
+        public string $fromDate,
+        public string $toDate,
+        public int $id
+    )
     {
-        $this->premium = $premium;
-        $this->count = $count;
-        $this->filterId = $filterId;
-        $this->fromDate = $fromDate;
-        $this->toDate = $toDate;
-        $this->id = $id;
     }
 
     /**
@@ -68,18 +62,13 @@ class LoadTweetsJob implements ShouldQueue, JobInterface
         try {
             $this->fireEvent('Carregando Dados...');
             if ($this->premium) {
-                $tweets = $this->_loadTweetsPremiumAPI($this->count, $this->toDate, $this->fromDate, $this->filterId);
+                $tweets = $this->loadTweetsPremiumAPI($this->count, $this->toDate, $this->fromDate, $this->filterId);
             } else {
-                $tweets = $this->_loadTweetsStandartAPI($this->count, $this->toDate, $this->filterId);
+                $tweets = $this->loadTweetsStandartAPI($this->count, $this->toDate, $this->filterId);
             }
             $this->fireEvent('Dados Carregados!');
             SaveTweetsJob::dispatch($tweets, $this->filterId, $this->id);
         } catch (GuzzleException $e) {
-            $this->fireEvent(
-                'API do Twitter está exausta. O job foi colocado na fila novamente com delay de 15 minutos ({900} segundos).'
-            );
-            $this->release(900); //adicionar a fila novamente após 15 minutos
-        } catch (\Exception $e) {
             Log::error($e->getMessage());
             Log::error($e->getTraceAsString());
             $this->fireEvent(
@@ -93,34 +82,35 @@ class LoadTweetsJob implements ShouldQueue, JobInterface
     /**
      * Buscar os tweets usando a API Standart do Twitter
      *
-     * @param int $count    - Quantidade de tweets buscados
-     * @param int $until    - Data limite
+     * @param int $count - Quantidade de tweets buscados
+     * @param string $until - Data limite
      * @param int $filterId - Id do filtro
      *
      * @return array
+     * @throws GuzzleException
      */
-    private function _loadTweetsStandartAPI(int $count, string $until, int $filterId) : array
+    private function loadTweetsStandartAPI(int $count, string $until, int $filterId) : array
     {
-        $url = 'http://api.programmer.com.br.wazzu/Twitter?query=' . $this->_getHashtags($filterId) . '&count=' . $count . '&until=' . $until;
-        //.'&XDEBUG_SESSION_START=vscode';
-        return $this->_makeRequest($url);
+        $url = 'http://api.programmer.com.br.wazzu/Twitter?query=' . $this->getHashtags($filterId) . '&count=' . $count . '&until=' . $until;
+        return $this->makeRequest($url);
     }
 
     /**
      * Buscar os tweets usando a API Premium do Twitter
      *
-     * @param int $count    - Quantidade de tweets buscados
-     * @param int $toDate   - Data limite
-     * @param int $fromDate - Data limite
+     * @param int $count - Quantidade de tweets buscados
+     * @param string $toDate - Data limite
+     * @param string $fromDate - Data limite
      * @param int $filterId - Id do filtro
      *
      * @return array
+     * @throws GuzzleException
      */
-    private function _loadTweetsPremiumAPI(int $count, string $toDate, string $fromDate, int $filterId) : array
+    private function loadTweetsPremiumAPI(int $count, string $toDate, string $fromDate, int $filterId) : array
     {
-        $url = 'http://api.programmer.com.br.wazzu/TwitterPremium30?query=' . $this->_getHashtags($filterId) . '&count=' . $count
-                    .'&fromDate='. $fromDate.'&toDate='.$toDate; //.'&XDEBUG_SESSION_START=vscode';
-        return $this->_makeRequest($url);
+        $url = 'http://api.programmer.com.br.wazzu/TwitterPremium30?query=' . $this->getHashtags($filterId) . '&count=' . $count
+                    .'&fromDate='. $fromDate.'&toDate='.$toDate;
+        return $this->makeRequest($url);
     }
 
     /**
@@ -132,7 +122,7 @@ class LoadTweetsJob implements ShouldQueue, JobInterface
      *
      * @throws GuzzleException
      */
-    private function _makeRequest(string $url) : array
+    private function makeRequest(string $url) : array
     {
         $client = resolve(Client::class);
         $response = $client->request(
@@ -155,7 +145,7 @@ class LoadTweetsJob implements ShouldQueue, JobInterface
      *
      * @return string
      */
-    private function _getHashtags($filterId)
+    private function getHashtags(int $filterId): string
     {
         $hashtags = resolve(FilterInterface::class)->find($filterId)->hashtags()->where('primary', true)->get();
         $query = $hashtags[0]->name;

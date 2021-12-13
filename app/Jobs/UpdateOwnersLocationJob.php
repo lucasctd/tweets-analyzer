@@ -7,6 +7,7 @@ use App\Exceptions\AppException;
 use App\Interfaces\JobInterface;
 use App\Models\TweetOwner;
 use App\Traits\LocationTrait;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -35,7 +36,6 @@ class UpdateOwnersLocationJob implements ShouldQueue, JobInterface
      */
     public function __construct()
     {
-        //
     }
 
     /**
@@ -55,7 +55,7 @@ class UpdateOwnersLocationJob implements ShouldQueue, JobInterface
         try {
             foreach ($owners as $owner) {
                 $location = $this->_getLocation($owner->location);
-                $city = $this->_getCity($location[0]);
+                $city = $this->getCity($location[0]);
                 $state = $this->getState($location[0]);
                 $cityName = 'NE';
                 $stateName = 'NE';
@@ -84,7 +84,7 @@ class UpdateOwnersLocationJob implements ShouldQueue, JobInterface
             }
             $this->fireEvent("Análise finalizada, $totalAtualizado registros foram atualizados e $totalNaoAtualizado não tiveram sua localização identificada.");
             DB::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             $this->fireEvent('Ocorreu um erro, as alterações não foram persistidas, favor verificar o log para detalhes.');
             Log::error($e->getMessage());
@@ -97,9 +97,9 @@ class UpdateOwnersLocationJob implements ShouldQueue, JobInterface
      *
      * @param string $ownerLocation - Localização do usuário conforme Twitter API
      *
+     * @return array
      * @link https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/user-object
      *
-     * @return void
      */
     private function _getLocation(string $ownerLocation): array
     {

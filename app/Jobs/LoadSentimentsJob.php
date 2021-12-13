@@ -32,28 +32,22 @@ class LoadSentimentsJob implements ShouldQueue, JobInterface
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $tries = 1;
-    public $timeout = 7200;
-    public $tweets;
-    public $id;
-    private $_tweetsAnalizados = 0;
-    private $_releaseDelay = 240;
-    private $_remainingAttempts;
+    public int $tries = 1;
+    public int $timeout = 7200;
+    private int $tweetsAnalizados = 0;
+    private int $releaseDelay = 240;
 
     /**
      * Create a new job instance.
      *
      * @param Collection $tweets             - Lista de tweets a serem analisados
      * @param int        $id                 - Id do job
-     * @param int        $_remainingAttempts - Quantidades de tentativas restantes
+     * @param int        $remainingAttempts - Quantidades de tentativas restantes
      *
      * @return void
      */
-    public function __construct(Collection $tweets, int $id, int $_remainingAttempts = 3)
+    public function __construct(public Collection $tweets, public int $id, private int $remainingAttempts = 3)
     {
-        $this->tweets = $tweets;
-        $this->id = $id;
-        $this->_remainingAttempts = $_remainingAttempts;
     }
 
     /**
@@ -82,20 +76,20 @@ class LoadSentimentsJob implements ShouldQueue, JobInterface
                 
                 $documentSentiment = $sentimentResult->info()['documentSentiment'];
 
-                $sentiment = $this->_saveSentiment($documentSentiment['score'], $documentSentiment['magnitude'], $tweet->id);
+                $sentiment = $this->saveSentiment($documentSentiment['score'], $documentSentiment['magnitude'], $tweet->id);
                 $this->_saveSentences($sentimentResult->sentences(), $sentiment);
                 $this->_saveEntities($entityResult->info()['entities'], $sentiment);
                 $tweet->sentiment_id = $sentiment->id;
                 $tweet->save();
-                $this->_tweetsAnalizados+=1;
-                $novoPercentual = $this->_calcPercentual($this->_tweetsAnalizados, $total);
+                $this->tweetsAnalizados+=1;
+                $novoPercentual = $this->_calcPercentual($this->tweetsAnalizados, $total);
                 if ($novoPercentual != $percentual) {
                     $percentual = $novoPercentual;
                     $this->fireEvent('{'.$percentual.'}%');
                 }
                 DB::commit();
             }
-            $this->fireEvent($this->_tweetsAnalizados.' tweets foram análisados com sucessos!');
+            $this->fireEvent($this->tweetsAnalizados.' tweets foram análisados com sucessos!');
         } catch (Throwable $e) {
             DB::rollBack();
             $this->_treatException($e);
@@ -114,14 +108,14 @@ class LoadSentimentsJob implements ShouldQueue, JobInterface
         Log::error($e->getMessage());
         Log::error(AppException::getTraceAsString($e));
 
-        if ($this->_remainingAttempts > 0) {
+        if ($this->remainingAttempts > 0) {
             $this->fireEvent(
-                'Ocorreu um erro ao analisar os sentimentos, somente '. $this->_tweetsAnalizados .
+                'Ocorreu um erro ao analisar os sentimentos, somente '. $this->tweetsAnalizados .
                 ' tweet(s) foram analisados. O job foi posto na fila novamente onde '
-                .(count($this->tweets) - $this->_tweetsAnalizados) . ' tweet(s) restante(s) serão analisados em: {'. $this->_releaseDelay .'} segundos'
+                .(count($this->tweets) - $this->tweetsAnalizados) . ' tweet(s) restante(s) serão analisados em: {'. $this->releaseDelay .'} segundos'
             );
-            $this->tweets = $this->tweets->slice($this->_tweetsAnalizados);
-            LoadSentimentsJob::dispatch($this->tweets, $this->id, --$this->_remainingAttempts)->delay(now()->addSeconds($this->_releaseDelay));
+            $this->tweets = $this->tweets->slice($this->tweetsAnalizados);
+            LoadSentimentsJob::dispatch($this->tweets, $this->id, --$this->remainingAttempts)->delay(now()->addSeconds($this->releaseDelay));
         } else {
             $this->fireEvent('O Job falhou pelo máximo número de vezes permitido! Nenhuma nova tentativa será feita.');
         }
@@ -133,13 +127,13 @@ class LoadSentimentsJob implements ShouldQueue, JobInterface
      *
      * @param float $score     - Score do tweet conforme GNL
      * @param float $magnitude - Magnitude do tweet conforme GNL
-     * @param int   $tweetId   - Exceção
-     *
-     * @link https://cloud.google.com/natural-language/docs/basics
+     * @param int $tweetId   - Exceção
      *
      * @return Sentiment
+     *@link https://cloud.google.com/natural-language/docs/basics
+     *
      */
-    private function _saveSentiment($score, $magnitude, $tweetId): Sentiment
+    private function saveSentiment(float $score, float $magnitude, int $tweetId): Sentiment
     {
         $sentiment = Sentiment::make($score, $magnitude, $tweetId);
         $sentiment->save();

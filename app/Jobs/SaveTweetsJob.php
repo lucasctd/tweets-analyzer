@@ -41,10 +41,6 @@ class SaveTweetsJob implements ShouldQueue, JobInterface
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, LocationTrait;
 
-    public $tweets;
-    public $filterId;
-    public $id;
-
     /**
      * Create a new job instance.
      *
@@ -52,11 +48,8 @@ class SaveTweetsJob implements ShouldQueue, JobInterface
      * @param int   $filterId - id do filtro
      * @param int   $id       - id do job
      */
-    public function __construct(array $tweets, int $filterId, int $id)
+    public function __construct(public array $tweets, public int $filterId, public int $id)
     {
-        $this->tweets = $tweets;
-        $this->filterId = $filterId;
-        $this->id = $id;
     }
 
     /**
@@ -79,12 +72,12 @@ class SaveTweetsJob implements ShouldQueue, JobInterface
                 try {
                     $tweetOwner = TweetOwner::where('screen_name', $user->screen_name)->firstOrFail();
                     $usuariosRepetidos++;
-                } catch (ModelNotFoundException $e) {
-                    $tweetOwner = $this->_saveOwner($user);
+                } catch (ModelNotFoundException) {
+                    $tweetOwner = $this->saveOwner($user);
                 }
                 $tweet = Tweet::make($tweetJson, $tweetOwner->id, $this->filterId);
                 $tweet->save();
-                $this->_saveHashtags($tweet->id, $this->_getHashtagsList($tweetJson));
+                $this->saveHashtags($tweet->id, $this->getHashtagsList($tweetJson));
                 $tweetsSalvos++;
                 DB::commit();
             } catch (Exception $e) {
@@ -108,10 +101,10 @@ class SaveTweetsJob implements ShouldQueue, JobInterface
      *
      * @return array
      */
-    private function _getHashtagsList(object $data) : array
+    private function getHashtagsList(object $data) : array
     {
         if (property_exists($data, 'retweeted_status')) {
-            return $this->_getHashtagsList(((object) $data->retweeted_status));
+            return $this->getHashtagsList(((object) $data->retweeted_status));
         }
         if (property_exists($data, 'extended_tweet')) {
             $extendedTweet = ((object) $data->extended_tweet);
@@ -133,7 +126,7 @@ class SaveTweetsJob implements ShouldQueue, JobInterface
      *
      * @return void
      */
-    private function _saveHashtags(int $tweetId, array $hashTags)
+    private function saveHashtags(int $tweetId, array $hashTags)
     {
         foreach ($hashTags as $hashTag) {
             $hashTag = Hashtag::make('#' . $hashTag['text'], $tweetId, $this->filterId);
@@ -148,10 +141,8 @@ class SaveTweetsJob implements ShouldQueue, JobInterface
      *
      * @return TweetOwner
      */
-    private function _saveOwner(object $user) : TweetOwner
+    private function saveOwner(object $user) : TweetOwner
     {
-        $cityId = null;
-        $stateId = null;
         $location = explode(',', $user->location);
         $cityId = $this->_getCity($location[0]);
         $stateId = $this->_getState($location[0]);

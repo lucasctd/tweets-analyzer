@@ -1,7 +1,9 @@
 <?php
 namespace App\Models;
 
+use App\Interfaces\FilterInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Classe responsável pelo mapeamento da tabela hashtag
@@ -24,16 +26,16 @@ class Hashtag extends Model
     /**
      * Cria uma instância de Hashtag
      *
-     * @param string $name     - Nome da hashtag
-     * @param int    $tweetId  - Id do tweet
-     * @param int    $filterId - Id do filtro
-     * @param bool   $primary  - É uma hashtag primária?
+     * @param string $name - Nome da hashtag
+     * @param int $tweetId - Id do tweet
+     * @param int|null $filterId - Id do filtro
+     * @param bool $primary - É uma hashtag primária?
      *
      * @return Hashtag
      */
     public static function make(string $name, int $tweetId, int $filterId = null, bool $primary = false) : Hashtag
     {
-        $hashtag = new Hashtag(
+        return new Hashtag(
             [
                 'name' => $name,
                 'tweet_id' => $tweetId,
@@ -41,15 +43,14 @@ class Hashtag extends Model
                 'primary' => $primary,
             ]
         );
-        return $hashtag;
     }
 
     /**
      * Get the tweet from what this hashtag belongs to
      *
-     * @return Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function tweet()
+    public function tweet(): BelongsTo
     {
         return $this->belongsTo('App\Models\Tweet', 'tweet_id', 'id');
     }
@@ -57,9 +58,9 @@ class Hashtag extends Model
     /**
      * Get the PreCandidato from who this hashtag belongs to
      *
-     * @return Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function filter()
+    public function filter(): BelongsTo
     {
         $filter = resolve(FilterInterface::class);
         return $this->belongsTo(get_class($filter), 'filter_id', $filter->getIdPropertyName());

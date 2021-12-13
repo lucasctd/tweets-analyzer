@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Classe responsável pelo mapeamento da tabela city
@@ -26,9 +27,9 @@ class City extends Model
     /**
      * Retorna o estado a qual esta cidade pertence
      *
-     * @return Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function state()
+    public function state(): BelongsTo
     {
         return $this->belongsTo('App\Models\State', 'codigo_uf', 'codigo');
     }

@@ -1,6 +1,8 @@
 <?php
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 /**
  * Classe resposável pelo mapeamento da tabela precandidato
  *
@@ -29,21 +31,20 @@ class PreCandidato extends AbstractFilter
      */
     public static function make(string $nome, string $partido) : PreCandidato
     {
-        $preCandidato = new PreCandidato(
+        return new PreCandidato(
             [
                 'nome' => $nome,
                 'partido' => $partido,
             ]
         );
-        return $preCandidato;
     }
 
     /**
      * Retorna lista de hashtags vinculadas ao pre-candidato
      *
-     * @return array
+     * @return HasMany
      */
-    public function hashtags() : \Illuminate\Database\Eloquent\Relations\HasMany
+    public function hashtags() : HasMany
     {
         return $this->hasMany('App\Models\Hashtag', 'filter_id', 'id');
     }
@@ -51,9 +52,9 @@ class PreCandidato extends AbstractFilter
     /**
      * Retorna lista de tweets vinculados ao pre-candidato
      *
-     * @return array
+     * @return HasMany
      */
-    public function tweets()
+    public function tweets(): HasMany
     {
         return $this->hasMany('App\Models\Tweet', 'filter_id', 'id');
     }
@@ -71,7 +72,7 @@ class PreCandidato extends AbstractFilter
      *
      * @inheritDoc
      */
-    public function getNameAttribute()
+    public function getNameAttribute(): string
     {
         return $this->attributes['nome'];
     }
@@ -80,7 +81,7 @@ class PreCandidato extends AbstractFilter
      *
      * @inheritDoc
      */
-    public function getIdAttribute()
+    public function getIdAttribute(): string
     {
         return $this->attributes['id'];
     }

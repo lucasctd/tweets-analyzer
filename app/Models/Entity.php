@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Classe responsável pelo mapeamento da tabela entity
@@ -26,15 +27,15 @@ class Entity extends Model
     /**
      * Cria uma instância de Hashtag
      *
-     * @param string $name        - Nome da hashtag
-     * @param string $type        - Id do tweet
-     * @param array  $metadata    - Id do filtro
-     * @param float  $salience    - É uma hashtag primária?
-     * @param int    $sentimentId - É uma hashtag primária?
+     * @param string $name - Nome da hashtag
+     * @param string $type - Id do tweet
+     * @param array $metadata - Id do filtro
+     * @param float $salience - É uma hashtag primária?
+     * @param int $sentimentId - É uma hashtag primária?
      *
-     * @return Hashtag
+     * @return Entity
      */
-    public static function make($name, $type, $metadata, $salience, $sentimentId): Entity
+    public static function make(string $name, string $type, array $metadata, float $salience, int $sentimentId): Entity
     {
         $wikipediaUrl = null;
         $mid = null;
@@ -60,9 +61,9 @@ class Entity extends Model
     /**
      * Retorna sentimento a qual está entidade pertence
      *
-     * @return Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function sentiment()
+    public function sentiment(): BelongsTo
     {
         return $this->belongsTo('App\Models\Sentiment', 'id', 'sentiment_id');
     }

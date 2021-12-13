@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Classe resposável pelo mapeamento da tabela state
@@ -26,9 +27,9 @@ class State extends Model
     /**
      * Retorna cidades vinculadas ao estado
      *
-     * @return Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
-    public function cities()
+    public function cities(): HasMany
     {
         return $this->hasMany('App\Models\City', 'br_state_id', 'codigo');
     }

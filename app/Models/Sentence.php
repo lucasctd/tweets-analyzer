@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Classe resposável pelo mapeamento da tabela sentence
@@ -26,21 +27,21 @@ class Sentence extends Model
     /**
      * Cria uma instância de pre-candidato
      *
-     * @param object $text        - texto da sentença
-     * @param int    $score       - Resultado da avaliação do Google Natural Language
-     * @param string $magnitude   - Magnitude conforme informado pelo Google
+     * @param string $text - texto da sentença
+     * @param int $score - Resultado da avaliação do Google Natural Language
+     * @param string $magnitude - Magnitude conforme informado pelo Google
      * @param string $sentimentId - Id do sentimento
      *
-     * @return Tweet
+     * @return Sentence
      */
-    public static function make($text, $score, $magnitude, $sentimentId): Sentence
+    public static function make(string $text, int $score, string $magnitude, string $sentimentId): Sentence
     {
         return new Sentence(
             [
-            'text' => $text,
-            'score' => $score,
-            'magnitude' => $magnitude,
-            'sentiment_id' => $sentimentId
+                'text' => $text,
+                'score' => $score,
+                'magnitude' => $magnitude,
+                'sentiment_id' => $sentimentId
             ]
         );
     }
@@ -48,9 +49,9 @@ class Sentence extends Model
     /**
      * Retorna sentimento da sentença
      *
-     * @return Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function sentiment()
+    public function sentiment(): BelongsTo
     {
         return $this->belongsTo('App\Models\Sentiment', 'id', 'sentiment_id');
     }

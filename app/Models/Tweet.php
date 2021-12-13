@@ -6,6 +6,8 @@ use App\Interfaces\FilterInterface;
 use App\Traits\ModelTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Classe resposável pelo mapeamento da tabela tweet
@@ -27,24 +29,23 @@ class Tweet extends Model
     protected $fillable = [
         'id', 'id_str', 'text', 'favorite_count', 'retweet_count','reply_count', 'quote_count','url','tweet_created_at', 'owner_id', 'sentiment_id', 'filter_id'
     ];
-    
+
     /**
      * Cria uma instância de Tweet
      *
-     * @param object $tweet    - objeto tweet
-     * @param int    $ownerId  - id do dono do tweet
-     * @param string $filterId - Id do filtro
+     * @param object $tweet - objeto tweet
+     * @param int $ownerId - id do dono do tweet
+     * @param int $filterId - Id do filtro
      *
      * @return Tweet
      */
     public static function make(object $tweet, int $ownerId, int $filterId) : Tweet
     {
-        
-        $tweet = new Tweet(
+        return new Tweet(
             [
                 'id' => $tweet->id,
                 'id_str' => $tweet->id_str,
-                'text' => self::_getText($tweet),
+                'text' => self::getText($tweet),
                 'favorite_count' => $tweet->favorite_count,
                 'retweet_count' => $tweet->retweet_count,
                 'reply_count' => self::getValue('reply_count', $tweet),
@@ -57,7 +58,6 @@ class Tweet extends Model
                 'tweet_created_at' => Carbon::createFromFormat('D M d H:i:s O Y', $tweet->created_at),
             ]
         );
-        return $tweet;
     }
 
     /**
@@ -67,10 +67,10 @@ class Tweet extends Model
      *
      * @return string
      */
-    private static function _getText(object $tweet) : string
+    private static function getText(object $tweet) : string
     {
         if (property_exists($tweet, 'retweeted_status')) {
-            return self::_getText(((object) $tweet->retweeted_status));
+            return self::getText(((object) $tweet->retweeted_status));
         }
         if (property_exists($tweet, 'extended_tweet')) {//premium api
             $text = self::getValue('full_text', ((object) $tweet->extended_tweet));
@@ -84,9 +84,9 @@ class Tweet extends Model
     /**
      * Retorna dono do Tweet
      *
-     * @return Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function owner()
+    public function owner(): BelongsTo
     {
         return $this->belongsTo('App\Models\TweetOwner', 'owner_id', 'id');
     }
@@ -94,9 +94,9 @@ class Tweet extends Model
     /**
      * Retorna entidade de filtro do Tweet
      *
-     * @return Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function filter()
+    public function filter(): BelongsTo
     {
         $filter = resolve(FilterInterface::class);
         return $this->belongsTo(get_class($filter), 'filter_id', $filter->getIdPropertyName());
@@ -105,9 +105,9 @@ class Tweet extends Model
     /**
      * Retorna sentimento do Tweet
      *
-     * @return Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return HasOne
      */
-    public function sentiment()
+    public function sentiment(): HasOne
     {
         return $this->hasOne('App\Models\Sentiment', 'id', 'sentiment_id');
     }

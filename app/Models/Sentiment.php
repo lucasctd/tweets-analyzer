@@ -26,13 +26,12 @@ class Sentiment extends Model
     /**
      * Cria uma instância de Sentiment
      *
-     * @param object $score     - score do tweet conforme GNL
-     * @param int    $magnitude - magnitude do sentimento conforme GNL
-     * @param string $tweetId   - Id do Tweet
+     * @param float $score     - score do tweet conforme GNL
+     * @param float $magnitude - magnitude do sentimento conforme GNL
      *
      * @return Sentiment
      */
-    public static function make($score, $magnitude, $tweetId): Sentiment
+    public static function make(float $score, float $magnitude): Sentiment
     {
         return new Sentiment(
             [

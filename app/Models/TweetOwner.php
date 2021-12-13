@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\ModelTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Classe resposável pelo mapeamento da tabela tweet_owner
@@ -31,15 +32,15 @@ class TweetOwner extends Model
     /**
      * Cria uma instância de TweetOwner
      *
-     * @param object $data    - objeto do dono do tweet
-     * @param int    $cityId  - Id da cidade
-     * @param string $stateId - Id do estado
+     * @param object $data - objeto do dono do tweet
+     * @param int|null $cityId - Id da cidade
+     * @param int|null $stateId - Id do estado
      *
      * @return TweetOwner
      */
     public static function make(object $data, int $cityId = null, int $stateId = null) : TweetOwner
     {
-        $tweetOwner = new TweetOwner(
+        return new TweetOwner(
             [
                 'id' => $data->id,
                 'id_str' => $data->id_str,
@@ -59,15 +60,14 @@ class TweetOwner extends Model
                 'br_state_id' => $stateId,
             ]
         );
-        return $tweetOwner;
     }
 
     /**
      * Retorna lista dos tweets vinculados a esta conta do Twitter
      *
-     * @return Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
-    public function tweets()
+    public function tweets(): HasMany
     {
         return $this->hasMany('App\Models\Tweet', 'owner_id', 'id');
     }

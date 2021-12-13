@@ -19,9 +19,9 @@ class LoadTweetsStatusEvent extends Event
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return \Illuminate\Broadcasting\Channel|array
+     * @return Channel
      */
-    public function broadcastOn()
+    public function broadcastOn(): Channel
     {
         return new Channel('tweet-channel');
     }
@@ -31,7 +31,7 @@ class LoadTweetsStatusEvent extends Event
      *
      * @return string
      */
-    public function broadcastAs()
+    public function broadcastAs(): string
     {
         return 'load-tweet-status-'.$this->id;
     }

@@ -21,18 +21,14 @@ abstract class Event implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $status;
-    public $id;
-
     /**
      * Create a new event instance.
      *
      * @param string $status - Mensagem de status do job
-     * @param int    $id     - Id do Job
+     * @param int|null $id - Id do Job
      */
-    public function __construct($status, $id = null)
+    public function __construct(public string $status, public ?int $id = null)
     {
         $this->status = $status .' ('.Carbon::now('America/Bahia').')';
-        $this->id = $id;
     }
 }

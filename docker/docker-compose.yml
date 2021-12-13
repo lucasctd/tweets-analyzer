@@ -7,7 +7,7 @@ services:
             - ../:/var/www/html
             - ./nginx/site.conf:/etc/nginx/conf.d/default.conf
         ports:
-            - "8060:80"
+            - "8061:80"
 
     php-ellections-tweets-analyzer:
         restart: on-failure

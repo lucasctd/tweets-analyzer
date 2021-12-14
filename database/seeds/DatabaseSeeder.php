@@ -12,6 +12,6 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
          $this->call(PreCandidatoTableSeeder::class);
-         $this->call(HashtagTableSeeder::class);
+         $this->call(HashtagPreCandidatoTableSeeder::class);
     }
 }

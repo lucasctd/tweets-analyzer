@@ -1,7 +1,7 @@
 FROM php:8.1-fpm-buster
 ENV ACCEPT_EULA=Y
 RUN apt-get update && apt-get install -y gnupg2
-RUN docker-php-ext-install bcmath
+RUN docker-php-ext-install bcmath mysqli pdo_mysql
 RUN pecl install xdebug
 RUN docker-php-ext-enable xdebug
 
